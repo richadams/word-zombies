@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,6 +10,12 @@
 int width     = 960;
 int height    = 640;
 int framerate = 15;
+
+// Colors
+color red                = #ff0000;
+color letterBlockBG      = #FFAE56;
+color letterBlockBGHit   = #FF3E3E;
+color letterBlockOutline = #ffffff;
 
 // Game Elements
 int deadZombies   = 0;
@@ -26,10 +32,10 @@ int currentState = GameState.MENU;
 Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
-int backgroundOffset = 0; 
-int backgroundLimit = height - 2000;
-
-int ammoRemaining = 10;
+int backgroundOffset   = 0; 
+int backgroundLimit    = height - 2000;
+int ammoRemaining      = 0;
+int zombiesRemaining   = 0;
 
 // Score counters
 int totalScore = 0;
@@ -45,6 +51,9 @@ int messageHeight = 200;
 PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
 PImage imgBackgroundGround = loadImage("img/background-ground.png");
 PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
+PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
+PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
+PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg"); 
 
 // Audio
 var audioMenu     = new Audio("./audio/menu.mp3");    
@@ -93,6 +102,8 @@ void setupBackground()
     image(imgBackgroundGround, 0, height - 216);
 
     // Score bar
+    stroke(0);
+    strokeWeight(1);
     fill(0);
     rect(0, 0, width, 24);
 
@@ -108,13 +119,29 @@ void setupBackground()
     fill(255);
     textSize(15);
     textAlign(RIGHT);
-    text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 18);
+    text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
     
     // Render current ammo
-    image(imgAmmoIcon, (width / 2), 2);
-    fill(255);
-    text(str(ammoRemaining), ((width / 2) + 22), 20);
+    if (ammoRemaining == 0)
+    {
+        image(imgAmmoEmptyIcon, (width / 2) - 20, 2);
+        fill(red);
+    }
+    else
+    {
+        image(imgAmmoIcon, (width / 2) - 20, 2);
+        fill(255);
+    }
+    textAlign(LEFT);
+    textFont(loadFont("serifbold"))
+    text(str(ammoRemaining), ((width / 2) + 5), 18);
     
+    // Render zombies reamining
+    image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
+    fill(255);
+    textAlign(LEFT);
+    textFont(loadFont("serifbold"))
+    text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
 // Show intro
@@ -149,8 +176,9 @@ void gameOver()
 {
     audioGameOver.play();
 
-    background(0);
-    fill(255);
+    image(imgBackgroundOver, 0, 0);
+    
+    fill(0);
 
     font = loadFont("serif");
     textFont(font);
@@ -161,10 +189,28 @@ void gameOver()
     textSize(30);
     textAlign(CENTER);
     text("Final Score: " + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
+}
+
+// Start Level
+void levelStartScreen()
+{
+    drawMessageArea();
+
+    fill(0);
+    font = loadFont("serif");
+    textFont(font);
+    textSize(50);
+    textAlign(CENTER);
+        
+    text("Level " + currentLevelNumber + ", Ready?", width / 2, height / 2);
+
+    textSize(30);
+    textAlign(CENTER);
+    text("You've been given " + currentLevel.getExtraAmmo() + " bullets.", width / 2, (height / 2) + 40);
 
     textSize(20);
     textAlign(CENTER);
-    text("(you suck)", width / 2, (height / 2) + 75);
+    text("Tap to start", width / 2, (height / 2) + 75);
 }
 
 // End of Level
@@ -186,8 +232,7 @@ void endOfLevel()
     {
         text("You survived until daylight!", width/2, height/2 - 50);
     }
-    
-    
+        
     text("Level " + currentLevelNumber + " completed!", width / 2, height / 2);
 
     textSize(30);
@@ -225,6 +270,14 @@ void draw()
     {
         stop();
         showIntro();
+        return;
+    }
+    
+    // If level loaded
+    if (currentState == GameState.LEVEL_LOADED)
+    {
+        stop();
+        levelStartScreen();
         return;
     }
 
@@ -316,6 +369,9 @@ void mouseReleased()
             getLevel(currentLevelNumber);            
             audioMenu.pause();
             break;
+       case GameState.LEVEL_LOADED:
+            currentLevel.startLevel();
+            break;
     }
 }
 
@@ -328,7 +384,7 @@ void loadLevel(params)
     // Update state
     currentState = GameState.LOADING_LEVEL;
 
-    // Create a new leveg
+    // Create a new level
     currentLevel = new Level(currentLevelNumber);
 
     // Go over each line
@@ -336,14 +392,30 @@ void loadLevel(params)
     for (var i in words)
     {
         if (words[i] == "") { continue; }
+        
+        // Parse out specials
+        if (words[i].charAt(0) == "*")
+        {
+            var word = words[i].substring(1);
+            var sections = word.split(":");
+            
+            // Can't use switch with strings in JS
+            if (sections[0] == "newammo")
+            {
+                ammoRemaining += (int)sections[1];
+                currentLevel.setExtraAmmo((int)sections[1]);
+            }
+            
+            continue;
+        }
 
         var segments = words[i].split(" ");
         Zombie z = new Zombie(segments[0], segments[1]);
         currentLevel.addZombie(z);
     }
-
-    // Start the level
-    currentLevel.startLevel();
+    
+    currentState = GameState.LEVEL_LOADED;
+    start();
 }
 
 void loadLevelFailed()
@@ -361,6 +433,7 @@ class Level
     var audioComplete = new Audio("./audio/level-complete.mp3");
 
     int num;
+    int extraAmmo = 0;
     boolean completed = false;
 
     // ctor
@@ -403,6 +476,7 @@ class Level
 
         // Start the game
         currentState = GameState.IN_GAME;
+        zombiesRemaining = levelZombies.size();
 
         // Restart the loop
         start();
@@ -428,6 +502,9 @@ class Level
         levelZombies.remove(0);
         return z;
     }
+    
+    void setExtraAmmo(int ammo) { extraAmmo = ammo; }
+    int getExtraAmmo() { return extraAmmo; }
 }
 
 // Player
@@ -482,14 +559,14 @@ class Zombie
     float speed;
     String word;
     boolean dead = false;
-
-    // Hit/NotHit
-    String hit = "";
-    String nothit = "";
     
     boolean playedIntro = false;
     var audioBegin = new Audio("./audio/zombie-arrive.mp3");
     var audioDie   = new Audio("./audio/zombie-die.mp3");
+    
+    ArrayList letters = new ArrayList();
+    Letter nextLetter;
+    int hitPosition = 0;
 
     // Current coords of the zombie
     int x;
@@ -506,7 +583,13 @@ class Zombie
     {
         speed = s;
         word  = w;
-        nothit = word;
+        
+        // Construct the letters
+        for (int i = 0; i < word.length; i++)
+        {
+            letters.add(new Letter(this, str(word.charAt(i)), i));
+        }
+        nextLetter = letters.get(hitPosition);
 
         heightOffset = (Math.random()*100) - 70;
 
@@ -533,16 +616,8 @@ class Zombie
             PImage b = loadImage("img/zombie.png");
             image(b, x - (zWidth / 2), y - (zHeight / 2));
 
-            // Draw the word above the zombie
-            font = loadFont("monospace");
-            fill(0);
-            textFont(font);
-            textAlign(LEFT);
-            textSize(50);
-            text(hit, x - (textWidth(word) / 2), y - (zHeight / 2) - 15);
-
-            fill(255);
-            text(nothit, x - (textWidth(word) / 2) + textWidth(hit) , y - (zHeight/2) - 15);
+            // Draw the letter blocks above the zombie
+            for (int i = 0; i < letters.size(); i++) { letters.get(i).draw(); }
         }
         // Dead Zombie
         else
@@ -571,22 +646,24 @@ class Zombie
     void tryToHit(k)
     {
         // Is it a hit?
-        if (nothit.indexOf(k) == 0)
+        if (letters.get(hitPosition).getLetter() == k)
         {
-            hit += nothit.charAt(0);
-            nothit = nothit.substring(1);
+            letters.get(hitPosition).hit();
+        
+            hitPosition++;
 
             totalScore++;
             levelScore++;
 
             // Determine if zombie should die
-            if (nothit == "")
+            if (hitPosition == letters.size())
             {
                 kill();
                 totalScore += 10;
                 levelScore += 10;
                 totalKills++;
                 levelKills++;
+                zombiesRemaining--;
             }
 
             return true;
@@ -601,6 +678,7 @@ class Zombie
     String getWord() { return word; }
     int getSpeed() { return speed; }
     int getX() { return x; }
+    int getY() { return y; }
 
     // Zombie is killed
     void kill()
@@ -622,6 +700,55 @@ class Zombie
 void updateNextZombieInterval()
 {
     nextZombieInterval = Math.floor(Math.random() * (framerate * 2)) + (framerate * 1);
+}
+
+// Letter Block
+////////////////////////////////////////////////////////////////////////////////////////////////////
+class Letter
+{
+    String letter;
+    int pos;
+    boolean h = false;
+    Zombie z;
+    
+    int width  = 30;
+    int height = 30;
+    int x;
+    int y;
+    int spacing = 5;
+    
+    Letter(Zombie zom, String s, int position)
+    {
+        z = zom;
+        letter = s;
+        pos = position;
+    }
+    
+    // Render the letter block
+    void draw()
+    {
+        // Determine position
+        x = z.getX()  + (z.getWidth()/2) - (z.getWord().length * (width + spacing)) + (pos * (width + spacing));
+        y = z.getY() - (z.getHeight() / 2) - 40;
+    
+        // Block
+        fill(((h) ? letterBlockBGHit : letterBlockBG));
+        stroke(letterBlockOutline);
+        strokeWeight(1);        
+        rect(x, y, width, height);
+        
+        // Text
+        font = loadFont("monospace");
+        fill(0);
+        textFont(font);
+        textAlign(LEFT);
+        textSize(30);
+        text(letter, x + 5, y + height - 7);
+    }
+    
+    void hit() { h = true; }
+    boolean isHit() { return h; }
+    String getLetter() { return letter; }
 }
 
 // Bullet
@@ -646,8 +773,9 @@ class Bullet
 
     void draw()
     {
-        fill(0);
-        stroke(0);
+        color bullet = #FF9622;
+        fill(bullet);
+        noStroke();
         ellipse(x, player.getBulletHeight(), 15, 5);
     }
 
