@@ -5,7 +5,7 @@ function getLevel(level)
 {
     // Retrieve the file
     $.ajax({
-        url: "/levels/" + level,
+        url: "./levels/" + level,
         success: function(response)
         {
             var p = Processing.getInstanceById("wwz");
