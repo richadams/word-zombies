@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
+/* @pjs preload="img/menu.jpg,img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,6 +53,7 @@ int messageWidth  = 600;
 int messageHeight = 200;
 
 // Images
+PImage imgMenu             = loadImage("img/menu.jpg");
 PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
 PImage imgBackgroundGround = loadImage("img/background-ground.png");
 PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
@@ -186,17 +187,14 @@ void showIntro()
 {
     if (audioEnabled) { audioMenu.play(); }
 
-    background(0);
-    fill(255);
-
-    textFont(fontSerif);
-    textSize(50);
-    textAlign(CENTER);
-    text("WORD ZOMBIES", width / 2, height / 2);
-
+    image(imgMenu, 0, 0);
+    
     textSize(20);
     textAlign(CENTER);
-    text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
+    fill(255);
+    text("Tap screen to start a new game!", (width / 2) +1, (height / 2) + 281);
+    fill(0);
+    text("Tap screen to start a new game!", width / 2, (height / 2) + 280);
 }
 
 void drawMessageArea()
