@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -18,7 +18,7 @@ Player player     = new Player();
 ArrayList bullets = new ArrayList();
 
 // Game Settings
-int backgroundSpeed = 10;
+int backgroundSpeed = 1;
 int bulletSpeed     = 100;
 
 // Game State
@@ -28,6 +28,8 @@ int currentLevelNumber = 1;
 int nextZombieInterval = 0;
 int backgroundOffset = 0; 
 int backgroundLimit = height - 2000;
+
+int ammoRemaining = 10;
 
 // Score counters
 int totalScore = 0;
@@ -39,10 +41,21 @@ int levelKills = 0;
 int messageWidth  = 600;
 int messageHeight = 200;
 
+// Images
+PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
+PImage imgBackgroundGround = loadImage("img/background-ground.png");
+PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
+
 // Audio
 var audioMenu     = new Audio("./audio/menu.mp3");    
 var audioBullet   = new Audio("./audio/bullet.wav");
 var audioGameOver = new Audio("./audio/scream.mp3");
+
+// Fonts
+//var fontNormal    = loadFont("./fonts/DejaVuSans-20.vlw");
+//var fontPopup     = loadFont("./fonts/DejaVuSansCondensed-20.vlw");
+//var fontPopupBold = loadFont("./fonts/DejaVuSansCondensed-Bold-20.vlw");
+//var fontBlocks    = loadFont("./fonts/DejaVuSerifCondensed-30.vlw");
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,28 +87,34 @@ void start()
 void setupBackground()
 {
     // Draw the sky    
-    PImage b = loadImage("img/background-sky.jpg");
-    image(b, 0, backgroundOffset);
+    image(imgBackgroundSky, 0, backgroundOffset);
 
     // Draw the ground
-    PImage b = loadImage("img/background-ground.png");
-    image(b, 0, height - 216);
+    image(imgBackgroundGround, 0, height - 216);
 
-    // Render the level    
-    font = loadFont("serif");
-    textFont(font);
+    // Score bar
     fill(0);
-    textSize(20);
+    rect(0, 0, width, 24);
+
+    // Render the level
+    textFont(loadFont("Serif"));
+    fill(255);
+    textSize(15);
     textAlign(LEFT);
-    text(" Level: " + currentLevelNumber, 0, 20);
+    text(" Level: " + currentLevelNumber, 0, 18);
 
     // Render the score
-    font = loadFont("serif");
-    textFont(font);
-    fill(0);
-    textSize(20);
+    textFont(loadFont("Serif"));
+    fill(255);
+    textSize(15);
     textAlign(RIGHT);
-    text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 20);
+    text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 18);
+    
+    // Render current ammo
+    image(imgAmmoIcon, (width / 2), 2);
+    fill(255);
+    text(str(ammoRemaining), ((width / 2) + 22), 20);
+    
 }
 
 // Show intro
@@ -278,6 +297,7 @@ void keyReleased()
     switch (currentState)
     {
         case GameState.IN_GAME:
+            if (ammoRemaining == 0) { return; }
             bullets.add(new Bullet(str(key))); // Fire a bullet
             break;
     }
@@ -620,6 +640,8 @@ class Bullet
         
         audioBullet.currentTime = 0;
         audioBullet.play();
+        
+        ammoRemaining--;
     }
 
     void draw()
