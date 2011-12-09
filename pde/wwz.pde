@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/slow_3.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
+/* @pjs preload="img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ ArrayList bullets = new ArrayList();
 int backgroundSpeed      = 1;
 int bulletSpeed          = 100;
 int zombieAnimationSpeed = 3; // Higher = slower
-int zombieFrames         = 4;
+int zombieFrames         = 3;
 
 boolean audioEnabled     = false;
 
@@ -61,6 +61,7 @@ PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
 PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
 PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg");
 PImage imgMoneyIcon        = loadImage("img/icons/money.png");
+PImage imgPlayer           = loadImage("img/player.png");
 
 // Audio
 var audioMenu;
@@ -172,14 +173,11 @@ void setupBackground()
         fill(255);
     }
     textAlign(LEFT);
-    textFont(fontSerif);
     text(str(ammoRemaining), ((width / 2) + 5), 18);
 
     // Render zombies reamining
     image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
     fill(255);
-    textAlign(LEFT);
-    textFont(fontSerif);
     text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
@@ -194,7 +192,7 @@ void showIntro()
     textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
-    text("WORDS WITH ZOMBIES", width / 2, height / 2);
+    text("WORD ZOMBIES", width / 2, height / 2);
 
     textSize(20);
     textAlign(CENTER);
@@ -607,8 +605,7 @@ class Player
 
     void draw()
     {
-        PImage p = loadImage("img/player.png");
-        image(p,  x - (pWidth / 2), y - (pHeight / 2));
+        image(imgPlayer,  x - (pWidth / 2), y - (pHeight / 2));
     }
 
     // Member functions
@@ -711,7 +708,7 @@ class Zombie
         else
         {
             PImage b = loadImage("img/dead-zombie.png");
-            image(b, x - (zWidth / 2), y - (zHeight / 2));
+            image(b, x - (zWidth / 2), y - (zHeight / 2) + 10);
         }
     }
 
@@ -773,7 +770,7 @@ class Zombie
     {
         if (audioEnabled) { audioDie.play(); }
 
-        deadZombies++;
+        deadZombies++;        
         dead = true;
 
         // Lower to ground
