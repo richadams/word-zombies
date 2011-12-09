@@ -40,8 +40,9 @@ int messageWidth  = 600;
 int messageHeight = 200;
 
 // Audio
-var audioMenu = new Audio("./audio/menu.mp3");    
-var audioBullet = new Audio("./audio/bullet.wav");
+var audioMenu     = new Audio("./audio/menu.mp3");    
+var audioBullet   = new Audio("./audio/bullet.wav");
+var audioGameOver = new Audio("./audio/scream.mp3");
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,6 +128,8 @@ void drawMessageArea()
 // Game over
 void gameOver()
 {
+    audioGameOver.play();
+
     background(0);
     fill(255);
 
