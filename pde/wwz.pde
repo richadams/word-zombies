@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -10,6 +10,9 @@
 int width     = 960;
 int height    = 640;
 int framerate = 15;
+
+// Colors
+color red = #ff0000;
 
 // Game Elements
 int deadZombies   = 0;
@@ -28,8 +31,8 @@ int currentLevelNumber = 1;
 int nextZombieInterval = 0;
 int backgroundOffset = 0; 
 int backgroundLimit = height - 2000;
-
-int ammoRemaining = 10;
+int ammoRemaining = 30;
+int zombiesRemaining = 0;
 
 // Score counters
 int totalScore = 0;
@@ -45,6 +48,9 @@ int messageHeight = 200;
 PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
 PImage imgBackgroundGround = loadImage("img/background-ground.png");
 PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
+PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
+PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
+PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg"); 
 
 // Audio
 var audioMenu     = new Audio("./audio/menu.mp3");    
@@ -111,10 +117,26 @@ void setupBackground()
     text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 18);
     
     // Render current ammo
-    image(imgAmmoIcon, (width / 2), 2);
-    fill(255);
-    text(str(ammoRemaining), ((width / 2) + 22), 20);
+    if (ammoRemaining == 0)
+    {
+        image(imgAmmoEmptyIcon, (width / 2) - 20, 2);
+        fill(red);
+    }
+    else
+    {
+        image(imgAmmoIcon, (width / 2) - 20, 2);
+        fill(255);
+    }
+    textAlign(LEFT);
+    textFont(loadFont("serifbold"))
+    text(str(ammoRemaining), ((width / 2) + 5), 18);
     
+    // Render zombies reamining
+    image(imgZombieIcon, (width / 2) + 30, 2);
+    fill(255);
+    textAlign(LEFT);
+    textFont(loadFont("serifbold"))
+    text(str(zombiesRemaining), ((width / 2) + 55), 18);
 }
 
 // Show intro
@@ -149,8 +171,9 @@ void gameOver()
 {
     audioGameOver.play();
 
-    background(0);
-    fill(255);
+    image(imgBackgroundOver, 0, 0);
+    
+    fill(0);
 
     font = loadFont("serif");
     textFont(font);
@@ -161,10 +184,6 @@ void gameOver()
     textSize(30);
     textAlign(CENTER);
     text("Final Score: " + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
-
-    textSize(20);
-    textAlign(CENTER);
-    text("(you suck)", width / 2, (height / 2) + 75);
 }
 
 // End of Level
@@ -403,6 +422,7 @@ class Level
 
         // Start the game
         currentState = GameState.IN_GAME;
+        zombiesRemaining = levelZombies.size();
 
         // Restart the loop
         start();
@@ -587,6 +607,7 @@ class Zombie
                 levelScore += 10;
                 totalKills++;
                 levelKills++;
+                zombiesRemaining--;
             }
 
             return true;
