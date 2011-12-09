@@ -40,7 +40,8 @@ int messageWidth  = 600;
 int messageHeight = 200;
 
 // Audio
-var audioMenu = new Audio("./audio/menu.mp3");
+var audioMenu = new Audio("./audio/menu.mp3");    
+var audioBullet = new Audio("./audio/bullet.wav");
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -613,6 +614,9 @@ class Bullet
     {
         key = k;
         x = player.getFront();
+        
+        audioBullet.currentTime = 0;
+        audioBullet.play();
     }
 
     void draw()
@@ -623,7 +627,7 @@ class Bullet
     }
 
     void run()
-    {
+    {    
         draw();
         x += speed;
 
