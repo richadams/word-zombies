@@ -12,7 +12,10 @@ int height    = 640;
 int framerate = 15;
 
 // Colors
-color red = #ff0000;
+color red                = #ff0000;
+color letterBlockBG      = #FFAE56;
+color letterBlockBGHit   = #FF3E3E;
+color letterBlockOutline = #ffffff;
 
 // Game Elements
 int deadZombies   = 0;
@@ -99,6 +102,8 @@ void setupBackground()
     image(imgBackgroundGround, 0, height - 216);
 
     // Score bar
+    stroke(0);
+    strokeWeight(1);
     fill(0);
     rect(0, 0, width, 24);
 
@@ -554,14 +559,14 @@ class Zombie
     float speed;
     String word;
     boolean dead = false;
-
-    // Hit/NotHit
-    String hit = "";
-    String nothit = "";
     
     boolean playedIntro = false;
     var audioBegin = new Audio("./audio/zombie-arrive.mp3");
     var audioDie   = new Audio("./audio/zombie-die.mp3");
+    
+    ArrayList letters = new ArrayList();
+    Letter nextLetter;
+    int hitPosition = 0;
 
     // Current coords of the zombie
     int x;
@@ -578,7 +583,13 @@ class Zombie
     {
         speed = s;
         word  = w;
-        nothit = word;
+        
+        // Construct the letters
+        for (int i = 0; i < word.length; i++)
+        {
+            letters.add(new Letter(this, str(word.charAt(i)), i));
+        }
+        nextLetter = letters.get(hitPosition);
 
         heightOffset = (Math.random()*100) - 70;
 
@@ -605,16 +616,8 @@ class Zombie
             PImage b = loadImage("img/zombie.png");
             image(b, x - (zWidth / 2), y - (zHeight / 2));
 
-            // Draw the word above the zombie
-            font = loadFont("monospace");
-            fill(0);
-            textFont(font);
-            textAlign(LEFT);
-            textSize(50);
-            text(hit, x - (textWidth(word) / 2), y - (zHeight / 2) - 15);
-
-            fill(255);
-            text(nothit, x - (textWidth(word) / 2) + textWidth(hit) , y - (zHeight/2) - 15);
+            // Draw the letter blocks above the zombie
+            for (int i = 0; i < letters.size(); i++) { letters.get(i).draw(); }
         }
         // Dead Zombie
         else
@@ -643,16 +646,17 @@ class Zombie
     void tryToHit(k)
     {
         // Is it a hit?
-        if (nothit.indexOf(k) == 0)
+        if (letters.get(hitPosition).getLetter() == k)
         {
-            hit += nothit.charAt(0);
-            nothit = nothit.substring(1);
+            letters.get(hitPosition).hit();
+        
+            hitPosition++;
 
             totalScore++;
             levelScore++;
 
             // Determine if zombie should die
-            if (nothit == "")
+            if (hitPosition == letters.size())
             {
                 kill();
                 totalScore += 10;
@@ -674,6 +678,7 @@ class Zombie
     String getWord() { return word; }
     int getSpeed() { return speed; }
     int getX() { return x; }
+    int getY() { return y; }
 
     // Zombie is killed
     void kill()
@@ -695,6 +700,55 @@ class Zombie
 void updateNextZombieInterval()
 {
     nextZombieInterval = Math.floor(Math.random() * (framerate * 2)) + (framerate * 1);
+}
+
+// Letter Block
+////////////////////////////////////////////////////////////////////////////////////////////////////
+class Letter
+{
+    String letter;
+    int pos;
+    boolean h = false;
+    Zombie z;
+    
+    int width  = 30;
+    int height = 30;
+    int x;
+    int y;
+    int spacing = 5;
+    
+    Letter(Zombie zom, String s, int position)
+    {
+        z = zom;
+        letter = s;
+        pos = position;
+    }
+    
+    // Render the letter block
+    void draw()
+    {
+        // Determine position
+        x = z.getX()  + (z.getWidth()/2) - (z.getWord().length * (width + spacing)) + (pos * (width + spacing));
+        y = z.getY() - (z.getHeight() / 2) - 40;
+    
+        // Block
+        fill(((h) ? letterBlockBGHit : letterBlockBG));
+        stroke(letterBlockOutline);
+        strokeWeight(1);        
+        rect(x, y, width, height);
+        
+        // Text
+        font = loadFont("monospace");
+        fill(0);
+        textFont(font);
+        textAlign(LEFT);
+        textSize(30);
+        text(letter, x + 5, y + height - 7);
+    }
+    
+    void hit() { h = true; }
+    boolean isHit() { return h; }
+    String getLetter() { return letter; }
 }
 
 // Bullet
