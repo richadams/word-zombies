@@ -12,7 +12,7 @@ int height    = 640;
 int framerate = 15;
 
 // Colours
-color sky = #5BA0FA;
+color sky    = #5BA0FA;
 color ground = #07A91F;
 
 // Game Elements
@@ -34,8 +34,11 @@ int totalKills = 0;
 int levelKills = 0;
 
 // Messages
-int messageWidth = 500;
+int messageWidth = 600;
 int messageHeight = 200;
+
+// Audio
+var audioMenu = new Audio("./audio/menu.mp3");
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +77,14 @@ void setupBackground()
     noStroke();
     rect(0, height - 200, width, 200);
 
+    // Render the level    
+    font = loadFont("serif");
+    textFont(font);
+    fill(0);
+    textSize(20);
+    textAlign(LEFT);
+    text(" Level: " + currentLevelNumber, 0, 20);
+
     // Render the score
     font = loadFont("serif");
     textFont(font);
@@ -86,6 +97,8 @@ void setupBackground()
 // Show intro
 void showIntro()
 {
+    audioMenu.play();
+
     background(0);
     fill(255);
 
@@ -249,7 +262,8 @@ void mouseReleased()
         case GameState.END_LEVEL:
             currentLevelNumber++; // Increment level, cascade to next option
         case GameState.MENU:
-            getLevel(currentLevelNumber);
+            getLevel(currentLevelNumber);            
+            audioMenu.pause();
             break;
     }
 }
@@ -418,6 +432,9 @@ class Zombie
     // Hit/NotHit
     String hit = "";
     String nothit = "";
+        
+    var audioBegin = new Audio("./audio/zombie-arrive.mp3");
+    var audioDie   = new Audio("./audio/zombie-die.mp3");
 
     // Current coords of the zombie
     int x;
@@ -441,6 +458,8 @@ class Zombie
         // Initial position
         x = width;
         y = height - (zHeight / 2) - 100 + heightOffset;
+        
+        audioBegin.play();
     }
 
     // Main activity loop for the zombie
@@ -532,6 +551,8 @@ class Zombie
     // Zombie is killed
     void kill()
     {
+        audioDie.play();
+        
         deadZombies++;
         dead = true;
 
