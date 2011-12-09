@@ -14,6 +14,9 @@ ArrayList deadZombies = new ArrayList();
 Zombie currentZombie;
 Player player = new Player();
 
+// Bullets
+ArrayList bullets = new ArrayList();
+
 // Is game active yet?
 boolean active = false;
 
@@ -167,6 +170,9 @@ void draw()
     
     // Draw all dead zombies
     for (int i = 0; i < deadZombies.size(); i++) { deadZombies.get(i).draw(); }
+    
+    // Draw bullets
+    for (int i = 0; i < bullets.size(); i++) { bullets.get(i).run(); }
 }
 
 // Capture keyboard events
@@ -181,8 +187,9 @@ void keyReleased()
         getLevel(currentLevelNumber);
         return;
     }
-
-    currentZombie.tryToHit(str(key));
+    
+    // Fire a bullet
+    bullets.add(new Bullet(str(key)));
 }
 
 
@@ -215,6 +222,48 @@ void loadLevelFailed()
     completedGame();
     var instance = Processing.getInstanceById('wwz');
     instance.noLoop();
+}
+
+// Bullet
+////////////////////////////////////////////////////////////////////////////////////////////////////
+class Bullet
+{
+    int speed = 100;
+    var key;
+    int x;
+
+    // ctor
+    Bullet(String k) 
+    {
+        key = k;        
+        x = player.getFront();
+    }
+    
+    void draw()
+    {         
+        fill(0);
+        stroke(0);
+        ellipse(x, height - 300, 15, 5);
+    }
+    
+    void run()
+    {
+        draw();
+        x += speed;
+       
+        if (x >= currentZombie.getX())
+        {   
+            if (currentZombie.tryToHit(key))
+            {
+                bullets.remove(0);
+            }
+        }
+        
+        if (x >= width)
+        {
+            bullets.remove(0);
+        }
+    }
 }
 
 // Level
@@ -424,7 +473,11 @@ class Zombie
                 score += 10;
                 zombieKills++;
             }
+            
+            return true;
         }
+        
+        return false;
     }
     
     // Member funcs
@@ -432,6 +485,7 @@ class Zombie
     int getHeight() { return zHeight; }
     String getWord() { return word; }
     int getSpeed() { return speed; }
+    int getX() { return x; }
     
     // Zombie is killed
     void kill() 
