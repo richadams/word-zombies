@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
+/* @pjs preload="img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/slow_3.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,6 +16,7 @@ color red                = #ff0000;
 color letterBlockBG      = #FFAE56;
 color letterBlockBGHit   = #FF0000;
 color letterBlockOutline = #000000;
+color bullet             = #FF9622;
 
 // Game Elements
 int deadZombies   = 0;
@@ -24,8 +25,10 @@ Player player     = new Player();
 ArrayList bullets = new ArrayList();
 
 // Game Settings
-int backgroundSpeed = 1;
-int bulletSpeed     = 100;
+int backgroundSpeed      = 1;
+int bulletSpeed          = 100;
+int zombieAnimationSpeed = 3; // Higher = slower
+int zombieFrames         = 4;
 
 // Game State
 int currentState = GameState.MENU;
@@ -82,6 +85,7 @@ void setup()
 // Start and stop animation processing
 void stop()
 {
+
     var instance = Processing.getInstanceById("wwz");
     instance.noLoop();
 }
@@ -454,7 +458,7 @@ void loadLevel(params)
         }
 
         var segments = words[i].split(" ");
-        Zombie z = new Zombie(segments[0], segments[1]);
+        Zombie z = new Zombie(segments[1], segments[2], segments[0]);
         currentLevel.addZombie(z);
     }
     
@@ -559,8 +563,10 @@ class Player
     int front; // Front of player, for collision detection.
     boolean dead = false;
 
-    int pWidth = 160;
+    // Player size
+    int pWidth  = 160;
     int pHeight = 200;
+
     int bulletHeight = 150; // from bottom
 
     int x = 50;
@@ -603,6 +609,7 @@ class Zombie
     // Members
     float speed;
     String word;
+    String zType;
     boolean dead = false;
     
     boolean playedIntro = false;
@@ -612,22 +619,26 @@ class Zombie
     ArrayList letters = new ArrayList();
     Letter nextLetter;
     int hitPosition = 0;
+    
+    // Zombie size
+    int zWidth  = 200;
+    int zHeight = 260;
+    
+    int animationFrame = 0;
+    int stepCounter = 0;
 
     // Current coords of the zombie
     int x;
     int y;
 
-    // So we can tweak values later
-    int zWidth = 137;
-    int zHeight = 200;
-
     int heightOffset = 0; // Random height offset to give 3d-ish appearance
 
     // Ctor
-    Zombie(String w, float s)
+    Zombie(String w, float s, String t)
     {
         speed = s;
         word  = w;
+        zType  = t;
         
         // Construct the letters
         for (int i = 0; i < word.length; i++)
@@ -646,6 +657,7 @@ class Zombie
     // Main activity loop for the zombie
     void run()
     {
+        stepCounter++;
         if (!playedIntro) { audioBegin.play(); playedIntro = true; }
         update();
         draw();
@@ -657,8 +669,11 @@ class Zombie
         // Alive Zombie
         if (!dead)
         {
+            if (stepCounter % zombieAnimationSpeed == 0) { animationFrame++; }
+            if (animationFrame == zombieFrames) { animationFrame = 0; }
+        
             // Draw zombie
-            PImage b = loadImage("img/zombie.png");
+            PImage b = loadImage("img/zombies/" + zType + "_" + animationFrame +".png");
             image(b, x - (zWidth / 2), y - (zHeight / 2));
 
             // Draw the letter blocks above the zombie
@@ -818,7 +833,6 @@ class Bullet
 
     void draw()
     {
-        color bullet = #FF9622;
         fill(bullet);
         noStroke();
         ellipse(x, player.getBulletHeight(), 15, 5);

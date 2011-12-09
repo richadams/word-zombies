@@ -1,16 +1,16 @@
 *newammo:100
-pizza 15
-zombie 10
-tasty 20
-eat 5
-send 15
-text 20
-fishing 5
-me 25
-shark 9
-brains 5
-mother 15
-friend 3
-chocolate 4
-playlist 8
-crocodile 15
+fast pizza 15
+slow zombie 10
+fast tasty 20
+slow eat 5
+fast send 15
+fast text 20
+slow fishing 5
+fast me 25
+slow shark 9
+slow brains 5
+fast mother 15
+slow friend 3
+slow chocolate 4
+slow playlist 8
+fast crocodile 15
