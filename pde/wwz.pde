@@ -27,7 +27,7 @@ Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
 int backgroundOffset = 0; 
-int backgroundLimit = height - 3000;
+int backgroundLimit = height - 2000;
 
 // Score counters
 int totalScore = 0;
@@ -154,6 +154,17 @@ void endOfLevel()
     textFont(font);
     textSize(50);
     textAlign(CENTER);
+    
+    if (currentState == GameState.END_LEVEL_ALL_DEAD)
+    {
+        text("You killed all the zombies!", width/2, height/2 - 50);
+    }
+    else if (currentState == GameState.END_LEVEL_DAYLIGHT)
+    {
+        text("You survived until daylight!", width/2, height/2 - 50);
+    }
+    
+    
     text("Level " + currentLevelNumber + " completed!", width / 2, height / 2);
 
     textSize(30);
@@ -195,7 +206,8 @@ void draw()
     }
 
     // If end of level
-    if (currentState == GameState.END_LEVEL)
+    if (currentState == GameState.END_LEVEL_ALL_DEAD
+        || currentState == GameState.END_LEVEL_DAYLIGHT)
     {
         stop();
         endOfLevel();
@@ -216,7 +228,8 @@ void draw()
     // If background is at limit, level is over
     if (backgroundOffset <= backgroundLimit)
     {
-        currentState = GameState.END_LEVEL;
+        currentState = GameState.END_LEVEL_DAYLIGHT;
+        currentLevel.complete();
     }
 
     // If interval is up, introduce another zombie.
@@ -231,7 +244,11 @@ void draw()
 
     // If no more zombies, and all zombies dead
     if (zombies.size() == deadZombies
-        && !currentLevel.isMoreZombies()) { currentLevel.complete(); }
+        && !currentLevel.isMoreZombies()) 
+    { 
+        currentState = GameState.END_LEVEL_ALL_DEAD;
+        currentLevel.complete(); 
+    }
 
     // Redraw background
     setupBackground();
@@ -268,7 +285,8 @@ void mouseReleased()
     // Action depends on state
     switch (currentState)
     {
-        case GameState.END_LEVEL:
+        case GameState.END_LEVEL_ALL_DEAD:
+        case GameState.END_LEVEL_DAYLIGHT:
             currentLevelNumber++; // Increment level, cascade to next option
         case GameState.MENU:
             getLevel(currentLevelNumber);            
@@ -333,10 +351,11 @@ class Level
     // Start the level
     void startLevel()
     {
-        // Clear previous zombies
+        // Clear previous zombies and reset data
         deadZombies = 0;
         zombies = new ArrayList();
         nextZombieInterval = 0;
+        backgroundOffset = 0;
 
         // Clear level score counters
         levelScore = 0; levelKills = 0;
@@ -372,7 +391,6 @@ class Level
     {
         completed = true;
         audioComplete.play();
-        currentState = GameState.END_LEVEL;
     }
 
     boolean isMoreZombies() { return (levelZombies.size() != 0); }
