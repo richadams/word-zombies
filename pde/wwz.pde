@@ -21,6 +21,7 @@ int currentLevelNumber = 1;
 Level currentLevel;
 
 int score = 0;
+int zombieKills = 0;
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +51,7 @@ void setupBackground()
     fill(0);
     textSize(20);
     textAlign(RIGHT);
-    text("Score: " + score + " ", width, 20);
+    text("Score: " + score + " Kills: " + zombieKills + " ", width, 20);
 }
 
 // Game over
@@ -68,11 +69,11 @@ void gameOver()
     
     textSize(30);
     textAlign(CENTER);
-    text("Final Score: " + score, width / 2, (height / 2) + 40);
+    text("Final Score: " + score + " Kills: " + zombieKills, width / 2, (height / 2) + 40);
     
     textSize(20);
     textAlign(CENTER);
-    text("(you suck)", width / 2, (height / 2) + 55);
+    text("(you suck)", width / 2, (height / 2) + 75);
 }
 
 // End of Level
@@ -90,7 +91,7 @@ void endOfLevel()
     
     textSize(30);
     textAlign(CENTER);
-    text("Score: " + score, width / 2, (height / 2) + 40);
+    text("Score: " + score + " Kills: " + zombieKills, width / 2, (height / 2) + 40);
     
     textSize(20);
     textAlign(CENTER);
@@ -109,6 +110,10 @@ void completedGame()
     textSize(50);
     textAlign(CENTER);
     text("You completed the game! Well done!", width / 2, height / 2);
+    
+    textSize(30);
+    textAlign(CENTER);
+    text("Final Score: " + score + " Kills: " + zombieKills, width / 2, (height / 2) + 40);
 }
 
 // Main Program Loop
@@ -187,7 +192,7 @@ void loadLevel(params)
 {
     // Params are in form "WORD SPEED\n";
     
-    // Create a new leve
+    // Create a new leveg
     currentLevel = new Level(currentLevelNumber);
     
     // Go over each line
@@ -237,13 +242,12 @@ class Level
     {
         // Clear previous dead zombies
         deadZombies = new ArrayList();
-    
+                
+        // Randomize zombies!    
         var shuffled = zombies.toArray();
-        
-        // Randomize zombies!
-        for (int i = zombies.size()-1; i > 0; i--)
+        for (int i = 0; i < zombies.size(); i++)
         {
-            int n =  Math.floor(Math.random()*i);
+            int n = Math.floor(Math.random()*zombies.size());
             var tmp = shuffled[n];
             shuffled[n] = shuffled[i];
             shuffled[i] = tmp;
@@ -254,9 +258,9 @@ class Level
         for (int i = 0; i < shuffled.length; i++)
         {
             zombies.add(shuffled[i]);
-        }        
-        
-        zombie = getNextZombie();
+        }
+                
+        // Get the next zombie and start the level
         active = true;
         
         // Restart the loop
@@ -272,9 +276,9 @@ class Level
     }
     
     Zombie getNextZombie()
-    {
+    {    
         // No more zombies!
-        if (currentZombie == zombies.size()-1)
+        if (currentZombie == zombies.size())
         {
             complete();
             return null;
@@ -283,7 +287,6 @@ class Level
         // Otherwise, return next zombie and increment counter
         Zombie z = zombies.get(currentZombie);
         currentZombie++;
-        
         return z;
     }
 }
@@ -415,7 +418,12 @@ class Zombie
             score++;
         
             // Determine if zombie should die
-            if (nothit == "") { kill(); }
+            if (nothit == "") 
+            { 
+                kill(); 
+                score += 10;
+                zombieKills++;
+            }
         }
     }
     
