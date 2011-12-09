@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.jpg,img/zombie.jpg,img/background-ground.jpg"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/background-ground.jpg,img/dead-zombie.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -32,6 +32,10 @@ int totalScore = 0;
 int levelScore = 0;
 int totalKills = 0;
 int levelKills = 0;
+
+// Messages
+int messageWidth = 500;
+int messageHeight = 200;
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,6 +86,14 @@ void setupBackground()
     text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 20);
 }
 
+void drawMessageArea()
+{
+    stroke(0);
+    strokeWeight(2);
+    fill(255);    
+    rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight); 
+}
+
 // Game over
 void gameOver()
 {
@@ -106,9 +118,9 @@ void gameOver()
 // End of Level
 void endOfLevel()
 {
-    background(0);
-    fill(255);
+    drawMessageArea();
     
+    fill(0);
     font = loadFont("serif"); 
     textFont(font);
     textSize(50);
@@ -121,7 +133,7 @@ void endOfLevel()
     
     textSize(20);
     textAlign(CENTER);
-    text("Press any key to continue", width / 2, (height / 2) + 75);
+    text("Tap to continue", width / 2, (height / 2) + 75);
 }
 
 // Completed the game!!
@@ -180,8 +192,6 @@ void draw()
     // If no more zombies, and all zombies dead
     if (zombies.size() == deadZombies
         && !currentLevel.isMoreZombies()) { currentLevel.complete(); }
-    
-    if (currentLevel.isComplete()) { return; }
         
     // Redraw background
     setupBackground();
@@ -349,7 +359,7 @@ class Player
     
     void draw()
     {
-        PImage p = loadImage("img/player.jpg");
+        PImage p = loadImage("img/player.png");
         image(p,  x - (pWidth / 2), y - (pHeight / 2));
     }
     
@@ -413,7 +423,7 @@ class Zombie
         if (!dead)
         {  
             // Draw zombie
-            PImage b = loadImage("img/zombie.jpg");
+            PImage b = loadImage("img/zombie.png");
             image(b, x - (zWidth / 2), y - (zHeight / 2));
             
             // Draw the word above the zombie
@@ -430,10 +440,8 @@ class Zombie
         // Dead Zombie
         else
         {
-            // Draw dead zombie              
-            fill(255, 0, 0);
-            stroke(255);
-            ellipse(x, y, 100, 10);
+            PImage b = loadImage("img/dead-zombie.png");
+            image(b, x - (zWidth / 2), y - (zHeight / 2));
         }
     }
     
