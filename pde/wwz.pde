@@ -154,20 +154,20 @@ void draw()
         return; 
     }
     
-    // If there's no zombie or our zombie died, introduce a new one
-    /*if (currentZombie == null 
-        || currentZombie.isDead())
-    {
-        currentZombies.add(currentLevel.getNextZombie());
-    }*/
-    
     // If interval is up, introduce another zombie.
     if (nextZombieInterval == 0)
     {
-        updateNextZombieInterval();
-        currentZombies.add(currentLevel.getNextZombie()); 
+        updateNextZombieInterval();        
+        Zombie z = currentLevel.getNextZombie();
+                
+        // If more zombies, add them.
+        if (z != null) { currentZombies.add(z); }
     }
-           
+    
+    // If no more zombies, and all zombies dead
+    if (currentZombies.size() == deadZombies.size()
+        && !currentLevel.isMoreZombies()) { currentLevel.complete(); }
+    
     if (currentLevel.isComplete()) { return; }
         
     // Redraw background
@@ -306,11 +306,13 @@ class Level
     // Start the level
     void start()
     {
-        // Clear previous dead zombies
+        // Clear previous zombies
         deadZombies = new ArrayList();
+        currentZombies = new ArrayList();
+        nextZombieInterval = 0;
                 
-        // Randomize zombies!    
-        var shuffled = zombies.toArray();
+        // Randomize zombies!
+        var shuffled = zombies.toArray();        
         for (int i = 0; i < zombies.size(); i++)
         {
             int n = Math.floor(Math.random()*zombies.size());
@@ -336,19 +338,17 @@ class Level
     
     // Member functions
     boolean isComplete() { return completed; }
+    int totalZombies() { return zombies.size(); }
     void complete() 
     {
         completed = true; 
     }
     
+    boolean isMoreZombies() { return (currentZombie != zombies.size()); }
     Zombie getNextZombie()
     {    
         // No more zombies!
-        if (currentZombie == zombies.size())
-        {
-            complete();
-            return null;
-        }
+        if (currentZombie == zombies.size()) { return null; }
         
         // Otherwise, return next zombie and increment counter
         Zombie z = zombies.get(currentZombie);
