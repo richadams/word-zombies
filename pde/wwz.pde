@@ -257,8 +257,6 @@ class Level
     int num;
     boolean completed = false;
     
-    int currentZombie = 0;
-    
     // ctor   
     Level(int levelNumber) 
     {
@@ -311,15 +309,15 @@ class Level
         completed = true; 
     }
     
-    boolean isMoreZombies() { return (currentZombie != levelZombies.size()); }
+    boolean isMoreZombies() { return (levelZombies.size() != 0); }
     Zombie getNextZombie()
-    {    
+    {
         // No more zombies!
-        if (currentZombie == levelZombies.size()) { return null; }
+        if (levelZombies.size() == 0) { return null; }
         
-        // Otherwise, return next zombie and increment counter
-        Zombie z = levelZombies.get(currentZombie);
-        currentZombie++;
+        // Otherwise, return the next zombie.
+        Zombie z = levelZombies.get(0);
+        levelZombies.remove(0);
         return z;
     }
 }
