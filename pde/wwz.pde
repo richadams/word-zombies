@@ -6,7 +6,7 @@
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// Game setup
+// Game Setup
 int width     = 960;
 int height    = 640;
 int framerate = 15;
@@ -21,10 +21,11 @@ ArrayList zombies = new ArrayList();
 Player player     = new Player();
 ArrayList bullets = new ArrayList();
 
-// Game state
-boolean active = false;
-int currentLevelNumber = 1;
+// Game State
+GameState = { MENU:0, LOADING_LEVEL:1, IN_GAME:2, END_LEVEL:3, END_GAME:4 }
+int currentState = 0;
 Level currentLevel;
+int currentLevelNumber = 1;
 int nextZombieInterval = 0;
 
 // Score counters
