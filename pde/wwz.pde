@@ -169,7 +169,7 @@ void setupBackground()
 
 // Show intro
 void showIntro()
-{
+{    
     audioMenu.play();
 
     background(0);
@@ -180,10 +180,10 @@ void showIntro()
     textSize(50);
     textAlign(CENTER);
     text("WORDS WITH ZOMBIES", width / 2, height / 2);
-
-    textSize(20);
+    
+    textSize(16);
     textAlign(CENTER);
-    text("Tap screen to start!", width / 2, (height / 2) + 75);
+    text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
 }
 
 void drawMessageArea()
@@ -390,8 +390,14 @@ void draw()
 
 // Capture Events
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-void keyReleased()
+void keyboardPress(k)
 {
+    key = k;
+    keyReleased();
+}
+
+void keyReleased()
+{    
     // Action depends on state
     switch (currentState)
     {
@@ -825,8 +831,8 @@ class Bullet
         key = k;
         x = player.getFront();
         
-        audioBullet.currentTime = 0;
-        audioBullet.play();
+        //audioBullet.currentTime = 0;
+        //audioBullet.play();
         
         ammoRemaining--;
     }

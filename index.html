@@ -7,7 +7,88 @@
     <script src="./js/processing.js"></script>
     
     <style>
-        * { margin: 0px; padding: 0px; }
+        * { 
+            margin: 0px; 
+            padding: 0px; 
+        }
+        
+        body {
+            background: #000;
+        }
+        
+        canvas {
+            height: 640px;
+        }
+        
+        #user-input { 
+            display: block;
+            border: none;
+            width: 768px;
+            height: 400px;
+            background: #000;
+        }
+        
+        #keyboard {
+            width: 768px;
+            background: #000;
+            padding-top: 60px;
+        }
+        
+        #keyboard input {
+            width: 65px;
+            height: 65px;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 3px !important;
+        }
+        
+        #keyboard .row {
+            text-align: center;
+            padding-bottom: 15px;
+        }
+        
+        input[type=submit] {
+            border: 1px solid #a9a9a9;
+            padding: 3px;
+            background: #f5f5f5;
+            font-size: 1em;
+            font-weight: normal;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            background-image: -webkit-gradient(
+                linear,
+                left bottom,
+                left top,
+                color-stop(0.44, rgb(223,223,223)),
+                color-stop(0.72, rgb(245,245,245))
+            );
+            background-image: -moz-linear-gradient(
+                center bottom,
+                rgb(223,223,223) 44%,
+                rgb(245,245,245) 72%
+            );
+        }
+
+        input[type=submit]:active {
+            background: #dfdfdf;
+            background-image: -webkit-gradient(
+                linear,
+                left bottom,
+                left top,
+                color-stop(0.44, rgb(245,245,245)),
+                color-stop(0.72, rgb(223,223,223))
+            );
+            background-image: -moz-linear-gradient(
+                center bottom,
+                rgb(245,245,245) 44%,
+                rgb(223,223,223) 72%
+            );
+        }
+
+        input[type=submit]:hover {
+            border: 1px solid #7f7f7f;
+        }
+
     </style>  
     
     <!-- Make it better on a phone -->
@@ -16,6 +97,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
 </head>
 <body>
-    <canvas id="wwz" data-processing-sources="./pde/wwz.pde"></canvas>
+    <canvas id="wwz" data-processing-sources="./pde/wwz.pde"></canvas>    
+    <div id="keyboard">
+        <div class="row">
+            <input type="submit" value="Q" />
+            <input type="submit" value="W" />
+            <input type="submit" value="E" />
+            <input type="submit" value="R" />
+            <input type="submit" value="T" />
+            <input type="submit" value="Y" />
+            <input type="submit" value="U" />
+            <input type="submit" value="I" />
+            <input type="submit" value="O" />
+            <input type="submit" value="P" />
+        </div>
+        <div class="row">
+            <input type="submit" value="A" />
+            <input type="submit" value="S" />
+            <input type="submit" value="D" />
+            <input type="submit" value="F" />
+            <input type="submit" value="G" />
+            <input type="submit" value="H" />
+            <input type="submit" value="J" />
+            <input type="submit" value="K" />
+            <input type="submit" value="L" />        
+        </div>
+        <div class="row">
+            <input type="submit" value="Z" />
+            <input type="submit" value="X" />
+            <input type="submit" value="C" />
+            <input type="submit" value="V" />
+            <input type="submit" value="B" />
+            <input type="submit" value="N" />
+            <input type="submit" value="M" />
+        </div>
+    </div>   
+    
 </body>
 </html>

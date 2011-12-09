@@ -21,3 +21,14 @@ function getLevel(level)
         }        
     });
 }
+
+// After document loaded
+$(document).ready(function ()
+{
+    // Capture keyboard events
+    $("#keyboard input").mousedown(function() 
+    { 
+        var p = Processing.getInstanceById("wwz");
+        p.keyboardPress($(this).attr("value"));
+    });
+});
