@@ -425,10 +425,10 @@ class Zombie
             textFont(font);
             textAlign(LEFT);
             textSize(50);
-            text(hit, x - (zWidth / 2), y - zHeight);
+            text(hit, x - (textWidth(word) / 2), y - zHeight);
                         
             fill(255);
-            text(nothit, x - (zWidth / 2) + textWidth(hit) , y - zHeight); 
+            text(nothit, x - (textWidth(word) / 2) + textWidth(hit) , y - zHeight); 
         }
         // Dead Zombie
         else
