@@ -719,8 +719,9 @@ class Bullet
 
     void draw()
     {
-        fill(0);
-        stroke(0);
+        color bullet = #FF9622;
+        fill(bullet);
+        noStroke();
         ellipse(x, player.getBulletHeight(), 15, 5);
     }
 
