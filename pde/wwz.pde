@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/background-ground.png,img/dead-zombie.png"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -11,21 +11,23 @@ int width     = 960;
 int height    = 640;
 int framerate = 15;
 
-// Colours
-color sky    = #5BA0FA;
-color ground = #07A91F;
-
 // Game Elements
 int deadZombies   = 0;
 ArrayList zombies = new ArrayList();
 Player player     = new Player();
 ArrayList bullets = new ArrayList();
 
+// Game Settings
+int backgroundSpeed = 10;
+int bulletSpeed     = 100;
+
 // Game State
 int currentState = GameState.MENU;
 Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
+int backgroundOffset = 0; 
+int backgroundLimit = height - 3000;
 
 // Score counters
 int totalScore = 0;
@@ -34,7 +36,7 @@ int totalKills = 0;
 int levelKills = 0;
 
 // Messages
-int messageWidth = 600;
+int messageWidth  = 600;
 int messageHeight = 200;
 
 // Audio
@@ -46,7 +48,6 @@ void setup()
 {
     size(width, height);
     frameRate(framerate);
-    setupBackground();
 }
 
 // Helper Functions
@@ -70,7 +71,9 @@ void start()
 
 void setupBackground()
 {
-    background(sky); // Draw the sky
+    // Draw the sky    
+    PImage b = loadImage("img/background-sky.jpg");
+    image(b, 0, backgroundOffset);
 
     // Draw the ground
     PImage b = loadImage("img/background-ground.png");
@@ -210,6 +213,12 @@ void draw()
     // Don't run rest while game isn't active.
     if (currentState != GameState.IN_GAME) { return; }
 
+    // If background is at limit, level is over
+    if (backgroundOffset <= backgroundLimit)
+    {
+        currentState = GameState.END_LEVEL;
+    }
+
     // If interval is up, introduce another zombie.
     if (nextZombieInterval == 0)
     {
@@ -237,6 +246,7 @@ void draw()
     for (int i = 0; i < bullets.size(); i++) { bullets.get(i).run(); }
 
     nextZombieInterval--;
+    backgroundOffset -= backgroundSpeed;
 }
 
 // Capture Events
@@ -306,6 +316,8 @@ class Level
 {
     ArrayList levelZombies = new ArrayList();
 
+    var audioComplete = new Audio("./audio/level-complete.mp3");
+
     int num;
     boolean completed = false;
 
@@ -359,6 +371,7 @@ class Level
     void complete()
     {
         completed = true;
+        audioComplete.play();
         currentState = GameState.END_LEVEL;
     }
 
@@ -431,7 +444,8 @@ class Zombie
     // Hit/NotHit
     String hit = "";
     String nothit = "";
-        
+    
+    boolean playedIntro = false;
     var audioBegin = new Audio("./audio/zombie-arrive.mp3");
     var audioDie   = new Audio("./audio/zombie-die.mp3");
 
@@ -457,13 +471,12 @@ class Zombie
         // Initial position
         x = width;
         y = height - (zHeight / 2) - 100 + heightOffset;
-        
-        audioBegin.play();
     }
 
     // Main activity loop for the zombie
     void run()
     {
+        if (!playedIntro) { audioBegin.play(); playedIntro = true; }
         update();
         draw();
     }
@@ -573,7 +586,7 @@ void updateNextZombieInterval()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 class Bullet
 {
-    int speed = 100;
+    int speed = bulletSpeed;
     var key;
     int x;
 
