@@ -9,7 +9,7 @@
 // Game Setup
 int width     = 768;
 int height    = 640;
-int framerate = 15;
+int framerate = 20;
 
 // Colors
 color red                = #ff0000;
@@ -68,7 +68,7 @@ var audioBullet;
 var audioGameOver;
 
 // Fonts
-var fontSerif     = loadFont("serif");
+var fontSerif     = loadFont("serifbold");
 //var fontNormal    = loadFont("./fonts/DejaVuSans-20.vlw");
 //var fontPopup     = loadFont("./fonts/DejaVuSansCondensed-20.vlw");
 //var fontPopupBold = loadFont("./fonts/DejaVuSansCondensed-Bold-20.vlw");
@@ -80,6 +80,15 @@ void setup()
 {
     size(width, height);
     frameRate(framerate);
+    
+    var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+    
+    if (is_chrome) 
+    { 
+        audioEnabled = true;
+        $("#keyboard").css("display", "none");
+        $("#canvas").css("margin", "0 auto");
+    }
 
     if (audioEnabled)
     {
@@ -148,9 +157,6 @@ void setupBackground()
     text(" Level: " + currentLevelNumber, 0, 18);
 
     // Render the score
-    textFont(fontSerif);
-    fill(255);
-    textSize(15);
     textAlign(RIGHT);
     text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
 
