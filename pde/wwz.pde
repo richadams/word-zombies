@@ -61,12 +61,57 @@ void gameOver()
     text("(you suck)", width / 2, (height / 2) + 55);
 }
 
+// End of Level
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void endOfLevel()
+{
+    background(0);
+    fill(255);
+    
+    font = loadFont("serif"); 
+    textFont(font);
+    textSize(50);
+    textAlign(CENTER);
+    text("Level " + currentLevelNumber + " completed.", width / 2, height / 2);
+    
+    textSize(20);
+    textAlign(CENTER);
+    text("Press any key to continue", width / 2, (height / 2) + 55);
+}
+
+// Completed the game!!
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void completedGame()
+{
+    background(0);
+    fill(255);
+    
+    font = loadFont("serif"); 
+    textFont(font);
+    textSize(50);
+    textAlign(CENTER);
+    text("You completed the game! Well done!", width / 2, height / 2);
+}
+
 // Main Program Loop
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void draw()
 {
     // Don't run while game isn't active.
     if (!active) { return; }
+
+    // If end of level
+    if (currentLevel.isComplete())
+    {
+        active = false;
+        
+        // Stop the game
+        var instance = Processing.getInstanceById('wwz');
+        instance.noLoop();
+        
+        endOfLevel();
+        return;
+    }
 
     // If Player is dead, then it's game over.
     if (player.isDead())
@@ -84,9 +129,8 @@ void draw()
         || currentZombie.isDead())
     {
         currentZombie = currentLevel.getNextZombie();
-        //new Zombie(words[currentWord], 25);
         
-        // If there are no more words, ?? level over?
+        if (currentLevel.isComplete()) { return; }
     }
     
     // Redraw background
@@ -106,6 +150,15 @@ void draw()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void keyReleased() 
 {
+    // If in not active state
+    if (!active)
+    {
+        // Start the next level
+        currentLevelNumber++;
+        getLevel(currentLevelNumber);
+        return;
+    }
+
     if (str(key).toUpperCase() == "Q")
     { 
         // Kill current zombie
@@ -140,7 +193,9 @@ void loadLevel(params)
 
 void loadLevelFailed()
 {
-    alert("Unable to load level data");
+    completedGame();
+    var instance = Processing.getInstanceById('wwz');
+    instance.noLoop();
 }
 
 // Level
@@ -150,7 +205,7 @@ class Level
     ArrayList zombies = new ArrayList();
     
     int num;
-    boolean complete = false;
+    boolean completed = false;
     
     int currentZombie = 0;
     
@@ -161,26 +216,51 @@ class Level
     }
     
     // Add a zombie
-    void addZombie(Zombie z) 
-    { 
-        //alert("Adding zombie - " + z.getWord() + ", " + z.getSpeed());
-        zombies.add(z); 
-    }
+    void addZombie(Zombie z) { zombies.add(z); }
     
     // Start the level
     void start()
     {
+        // Clear previous dead zombies
+        deadZombies = new ArrayList();
+    
+        var shuffled = zombies.toArray();
+        
+        // Randomize zombies!
+        for (int i = zombies.size()-1; i > 0; i--)
+        {
+            int n =  Math.floor(Math.random()*i);
+            var tmp = shuffled[n];
+            shuffled[n] = shuffled[i];
+            shuffled[i] = tmp;
+        }
+        
+        // This is horrible, fuck it.
+        zombies = new ArrayList();
+        for (int i = 0; i < shuffled.length; i++)
+        {
+            zombies.add(shuffled[i]);
+        }        
+        
         zombie = getNextZombie();
         active = true;
+        
+        // Restart the loop
+        var instance = Processing.getInstanceById('wwz');
+        instance.loop();
     }
     
     // Member functions
-    boolean isComplete() { return complete; }
-    void complete() { complete = true; }
+    boolean isComplete() { return completed; }
+    void complete() 
+    {
+        completed = true; 
+    }
+    
     Zombie getNextZombie()
     {
         // No more zombies!
-        if (currentZombie == zombies.size)
+        if (currentZombie == zombies.size()-1)
         {
             complete();
             return null;

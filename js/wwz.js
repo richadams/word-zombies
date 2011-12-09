@@ -11,7 +11,7 @@ function getLevel(level)
             var p = Processing.getInstanceById("wwz");
             p.loadLevel(response);
         },
-        failure: function(response)
+        error: function(response)
         {
             var p = Processing.getInstanceById("wwz");
             p.loadLevelFailed();
