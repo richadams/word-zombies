@@ -30,12 +30,14 @@ int bulletSpeed          = 100;
 int zombieAnimationSpeed = 3; // Higher = slower
 int zombieFrames         = 4;
 
+boolean audioEnabled     = false;
+
 // Game State
 int currentState = GameState.MENU;
 Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
-int backgroundOffset   = 0; 
+int backgroundOffset   = 0;
 int backgroundLimit    = height - 2000;
 int ammoRemaining      = 0;
 int zombiesRemaining   = 0;
@@ -57,15 +59,16 @@ PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
 PImage imgAmmoIconBlack    = loadImage("img/icons/ammo-black.png");
 PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
 PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
-PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg"); 
-PImage imgMoneyIcon        = loadImage("img/icons/money.png"); 
+PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg");
+PImage imgMoneyIcon        = loadImage("img/icons/money.png");
 
 // Audio
-var audioMenu     = new Audio("./audio/menu.mp3");    
-var audioBullet   = new Audio("./audio/bullet.wav");
-var audioGameOver = new Audio("./audio/scream.mp3");
+var audioMenu;
+var audioBullet;
+var audioGameOver;
 
 // Fonts
+var fontSerif     = loadFont("serif");
 //var fontNormal    = loadFont("./fonts/DejaVuSans-20.vlw");
 //var fontPopup     = loadFont("./fonts/DejaVuSansCondensed-20.vlw");
 //var fontPopupBold = loadFont("./fonts/DejaVuSansCondensed-Bold-20.vlw");
@@ -77,6 +80,13 @@ void setup()
 {
     size(width, height);
     frameRate(framerate);
+
+    if (audioEnabled)
+    {
+        audioMenu     = new Audio("./audio/menu.mp3");
+        audioBullet   = new Audio("./audio/bullet.wav");
+        audioGameOver = new Audio("./audio/scream.mp3");
+    }
 }
 
 // Helper Functions
@@ -107,7 +117,7 @@ void newGame()
     ammoRemaining      = 0;
     zombiesRemaining   = 0;
     currentLevelNumber = 1;
-    
+
     // Put into correct state, and start
     currentState = GameState.MENU;
     start();
@@ -118,7 +128,7 @@ void newGame()
 
 void setupBackground()
 {
-    // Draw the sky    
+    // Draw the sky
     image(imgBackgroundSky, 0, backgroundOffset);
 
     // Draw the ground
@@ -131,19 +141,19 @@ void setupBackground()
     rect(0, 0, width, 24);
 
     // Render the level
-    textFont(loadFont("Serif"));
+    textFont(fontSerif);
     fill(255);
     textSize(15);
     textAlign(LEFT);
     text(" Level: " + currentLevelNumber, 0, 18);
 
     // Render the score
-    textFont(loadFont("Serif"));
+    textFont(fontSerif);
     fill(255);
     textSize(15);
     textAlign(RIGHT);
     text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
-    
+
     // Render current ammo
     if (ammoRemaining == 0)
     {
@@ -156,32 +166,31 @@ void setupBackground()
         fill(255);
     }
     textAlign(LEFT);
-    textFont(loadFont("serifbold"))
+    textFont(fontSerif);
     text(str(ammoRemaining), ((width / 2) + 5), 18);
-    
+
     // Render zombies reamining
     image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
     fill(255);
     textAlign(LEFT);
-    textFont(loadFont("serifbold"))
+    textFont(fontSerif);
     text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
 // Show intro
 void showIntro()
-{    
-    audioMenu.play();
+{
+    if (audioEnabled) { audioMenu.play(); }
 
     background(0);
     fill(255);
 
-    font = loadFont("serif");
-    textFont(font);
+    textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
     text("WORDS WITH ZOMBIES", width / 2, height / 2);
-    
-    textSize(16);
+
+    textSize(20);
     textAlign(CENTER);
     text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
 }
@@ -191,7 +200,7 @@ void drawMessageArea()
     // Drop Shadow
     fill(0);
     rect((width / 2) - (messageWidth / 2) + 5, (height / 2) - (messageHeight /2) + 5, messageWidth, messageHeight);
-    
+
     fill(255);
     rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight);
 }
@@ -199,19 +208,18 @@ void drawMessageArea()
 // Game over
 void gameOver()
 {
-    audioGameOver.play();
+    if (audioEnabled) { audioGameOver.play(); }
 
     image(imgBackgroundOver, 0, 0);
-    
+
     drawMessageArea();
-    
+
     fill(0);
-    font = loadFont("serif");
-    textFont(font);
+    textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
     text("GAME OVER", width / 2, (height / 2) - 40);
-        
+
     textSize(25);
     textAlign(LEFT);
     text("Final Score:", width / 2 - (messageWidth / 2) + 100, (height / 2));
@@ -222,7 +230,7 @@ void gameOver()
     text ("You earned $" + levelScore + ".", width / 2 - (messageWidth / 2) + 100, (height/2) + 30);
     image(imgZombieIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) + 33);
     text ("You 'took care' of " + levelKills + " undead.", width / 2 - (messageWidth / 2) + 100, (height/2) + 50);
-    
+
     textSize(16);
     textAlign(CENTER);
     text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
@@ -231,16 +239,15 @@ void gameOver()
 // Start Level
 void levelStartScreen()
 {
-    if (audioMenu.paused) { audioMenu.play(); } // Restart menu audio.
+    if (audioEnabled) { if (audioMenu.paused) { audioMenu.play(); } } // Restart menu audio.
 
     drawMessageArea();
 
     fill(0);
-    font = loadFont("serif");
-    textFont(font);
+    textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
-        
+
     text("Level " + currentLevelNumber + ", Ready?", width / 2, height / 2 - 40);
 
     textSize(22);
@@ -261,15 +268,14 @@ void endOfLevel()
     drawMessageArea();
 
     fill(0);
-    font = loadFont("serif");
-    textFont(font);
+    textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
     text("Level " + currentLevelNumber + " completed!", width / 2, (height / 2) - 50);
 
     textSize(20);
-    textAlign(CENTER);     
-    
+    textAlign(CENTER);
+
     if (currentState == GameState.END_LEVEL_ALL_DEAD)
     {
         text("You killed all the zombies!", width/2, (height/2) - 20);
@@ -278,7 +284,7 @@ void endOfLevel()
     {
         text("You survived until daylight!", width/2, (height/2) - 20);
     }
-    
+
     textAlign(LEFT);
     image(imgMoneyIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) - 5);
     text ("You earned $" + levelScore + ".", width / 2 - (messageWidth / 2) + 100, (height/2) + 15);
@@ -296,8 +302,7 @@ void completedGame()
     background(0);
     fill(255);
 
-    font = loadFont("serif");
-    textFont(font);
+    textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
     text("You completed the game! Well done!", width / 2, height / 2);
@@ -318,7 +323,7 @@ void draw()
         showIntro();
         return;
     }
-    
+
     // If level loaded
     if (currentState == GameState.LEVEL_LOADED)
     {
@@ -366,10 +371,10 @@ void draw()
 
     // If no more zombies, and all zombies dead
     if (zombies.size() == deadZombies
-        && !currentLevel.isMoreZombies()) 
-    { 
+        && !currentLevel.isMoreZombies())
+    {
         currentState = GameState.END_LEVEL_ALL_DEAD;
-        currentLevel.complete(); 
+        currentLevel.complete();
     }
 
     // Redraw background
@@ -397,7 +402,7 @@ void keyboardPress(k)
 }
 
 void keyReleased()
-{    
+{
     // Action depends on state
     switch (currentState)
     {
@@ -446,20 +451,20 @@ void loadLevel(params)
     for (var i in words)
     {
         if (words[i] == "") { continue; }
-        
+
         // Parse out specials
         if (words[i].charAt(0) == "*")
         {
             var word = words[i].substring(1);
             var sections = word.split(":");
-            
+
             // Can't use switch with strings in JS
             if (sections[0] == "newammo")
             {
                 ammoRemaining += (int)sections[1];
                 currentLevel.setExtraAmmo((int)sections[1]);
             }
-            
+
             continue;
         }
 
@@ -467,7 +472,7 @@ void loadLevel(params)
         Zombie z = new Zombie(segments[1], segments[2], segments[0]);
         currentLevel.addZombie(z);
     }
-    
+
     currentState = GameState.LEVEL_LOADED;
     start();
 }
@@ -484,7 +489,7 @@ class Level
 {
     ArrayList levelZombies = new ArrayList();
 
-    var audioComplete = new Audio("./audio/level-complete.mp3");
+    var audioComplete;
 
     int num;
     int extraAmmo = 0;
@@ -494,6 +499,11 @@ class Level
     Level(int levelNumber)
     {
         num = levelNumber;
+
+        if (audioEnabled)
+        {
+            audioComplete = new Audio("./audio/level-complete.mp3");
+        }
     }
 
     // Add a zombie
@@ -530,8 +540,8 @@ class Level
 
         // Start the game
         currentState = GameState.IN_GAME;
-        zombiesRemaining = levelZombies.size();            
-        audioMenu.pause();
+        zombiesRemaining = levelZombies.size();
+        if (audioEnabled) { audioMenu.pause(); }
 
         // Restart the loop
         start();
@@ -543,7 +553,7 @@ class Level
     void complete()
     {
         completed = true;
-        audioComplete.play();
+        if (audioEnabled) { audioComplete.play(); }
     }
 
     boolean isMoreZombies() { return (levelZombies.size() != 0); }
@@ -557,7 +567,7 @@ class Level
         levelZombies.remove(0);
         return z;
     }
-    
+
     void setExtraAmmo(int ammo) { extraAmmo = ammo; }
     int getExtraAmmo() { return extraAmmo; }
 }
@@ -617,19 +627,19 @@ class Zombie
     String word;
     String zType;
     boolean dead = false;
-    
+
     boolean playedIntro = false;
-    var audioBegin = new Audio("./audio/zombie-arrive.mp3");
-    var audioDie   = new Audio("./audio/zombie-die.mp3");
-    
+    var audioBegin;
+    var audioDie;
+
     ArrayList letters = new ArrayList();
     Letter nextLetter;
     int hitPosition = 0;
-    
+
     // Zombie size
     int zWidth  = 200;
     int zHeight = 260;
-    
+
     int animationFrame = 0;
     int stepCounter = 0;
 
@@ -645,7 +655,13 @@ class Zombie
         speed = s;
         word  = w;
         zType  = t;
-        
+
+        if (audioEnabled)
+        {
+            audioBegin = new Audio("./audio/zombie-arrive.mp3");
+            audioDie   = new Audio("./audio/zombie-die.mp3");
+        }
+
         // Construct the letters
         for (int i = 0; i < word.length; i++)
         {
@@ -664,7 +680,7 @@ class Zombie
     void run()
     {
         stepCounter++;
-        if (!playedIntro) { audioBegin.play(); playedIntro = true; }
+        if (audioEnabled) { if (!playedIntro) { audioBegin.play(); playedIntro = true; } }
         update();
         draw();
     }
@@ -677,7 +693,7 @@ class Zombie
         {
             if (stepCounter % zombieAnimationSpeed == 0) { animationFrame++; }
             if (animationFrame == zombieFrames) { animationFrame = 0; }
-        
+
             // Draw zombie
             PImage b = loadImage("img/zombies/" + zType + "_" + animationFrame +".png");
             image(b, x - (zWidth / 2), y - (zHeight / 2));
@@ -715,7 +731,7 @@ class Zombie
         if (letters.get(hitPosition).getLetter() == k)
         {
             letters.get(hitPosition).hit();
-        
+
             hitPosition++;
 
             totalScore++;
@@ -749,8 +765,8 @@ class Zombie
     // Zombie is killed
     void kill()
     {
-        audioDie.play();
-        
+        if (audioEnabled) { audioDie.play(); }
+
         deadZombies++;
         dead = true;
 
@@ -776,42 +792,41 @@ class Letter
     int pos;
     boolean h = false;
     Zombie z;
-    
+
     int width  = 30;
     int height = 30;
     int x;
     int y;
     int spacing = 5;
-    
+
     Letter(Zombie zom, String s, int position)
     {
         z = zom;
         letter = s;
         pos = position;
     }
-    
+
     // Render the letter block
     void draw()
     {
         // Determine position
         x = z.getX()  + ((z.getWord().length/2) * (width + spacing)) - (z.getWord().length * (width + spacing)) + (pos * (width + spacing));
         y = z.getY() - (z.getHeight() / 2) - 40;
-    
+
         // Block
         fill(((h) ? letterBlockBGHit : letterBlockBG));
         stroke(letterBlockOutline);
-        strokeWeight(1);        
+        strokeWeight(1);
         rect(x, y, width, height);
-        
+
         // Text
-        font = loadFont("monospace");
         fill(0);
-        textFont(font);
+        textFont(loadFont("monospace"));
         textAlign(LEFT);
         textSize(30);
         text(letter, x + 5, y + height - 7);
     }
-    
+
     void hit() { h = true; }
     boolean isHit() { return h; }
     String getLetter() { return letter; }
@@ -830,10 +845,13 @@ class Bullet
     {
         key = k;
         x = player.getFront();
-        
-        //audioBullet.currentTime = 0;
-        //audioBullet.play();
-        
+
+        if (audioEnabled)
+        {
+            audioBullet.currentTime = 0;
+            audioBullet.play();
+        }
+
         ammoRemaining--;
     }
 
@@ -845,7 +863,7 @@ class Bullet
     }
 
     void run()
-    {    
+    {
         draw();
         x += speed;
 
