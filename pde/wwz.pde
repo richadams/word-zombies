@@ -159,11 +159,7 @@ void keyReleased()
         return;
     }
 
-    if (str(key).toUpperCase() == "Q")
-    { 
-        // Kill current zombie
-        currentZombie.kill();
-    }
+    currentZombie.tryToHit(str(key));
 }
 
 
@@ -311,6 +307,10 @@ class Zombie
     String word;
     boolean dead = false;
     
+    // Hit/NotHit
+    String hit = "";
+    String nothit = "";
+    
     // Current coords of the zombie
     int x;
     int y;
@@ -324,6 +324,7 @@ class Zombie
     {
         speed = s;
         word  = w;
+        nothit = word;
         
         // Initial position
         x = width;
@@ -349,10 +350,15 @@ class Zombie
             ellipse(x, y, zWidth, zHeight);
             
             // Draw the word above the zombie
-            font = loadFont("serif"); 
+            font = loadFont("monospace");
+            fill(0); 
             textFont(font);
-            textSize(20);
-            text(word, x - (zWidth / 2), y - zHeight); 
+            textAlign(LEFT);
+            textSize(50);
+            text(hit, x - (zWidth / 2), y - zHeight);
+                        
+            fill(255);
+            text(nothit, x - (zWidth / 2) + textWidth(hit) , y - zHeight); 
         }
         // Dead Zombie
         else
@@ -378,6 +384,20 @@ class Zombie
     
         x -= speed;      
     }    
+    
+    // Attempt to "hit" zombie with key
+    void tryToHit(k)
+    {        
+        // Now determine if it's the first letter.
+        if (nothit.indexOf(k) == 0)
+        {
+            hit += nothit.charAt(0);
+            nothit = nothit.substring(1);
+        }
+        
+        // Determine if zombie should die
+        if (nothit == "") { kill(); }
+    }
     
     // Member funcs
     int getWidth() { return zWidth; }
