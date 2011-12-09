@@ -13,7 +13,7 @@ int height = 640;
 int framerate = 15;
 
 ArrayList deadZombies = new ArrayList();
-Zombie currentZombie;
+ArrayList currentZombies = new ArrayList();;
 Player player = new Player();
 
 // Bullets
@@ -27,6 +27,8 @@ Level currentLevel;
 
 int score = 0;
 int zombieKills = 0;
+
+int nextZombieInterval = 0;
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -151,30 +153,39 @@ void draw()
         gameOver();
         return; 
     }
-
+    
     // If there's no zombie or our zombie died, introduce a new one
-    if (currentZombie == null 
+    /*if (currentZombie == null 
         || currentZombie.isDead())
     {
-        currentZombie = currentLevel.getNextZombie();
-        
-        if (currentLevel.isComplete()) { return; }
-    }
+        currentZombies.add(currentLevel.getNextZombie());
+    }*/
     
+    // If interval is up, introduce another zombie.
+    if (nextZombieInterval == 0)
+    {
+        updateNextZombieInterval();
+        currentZombies.add(currentLevel.getNextZombie()); 
+    }
+           
+    if (currentLevel.isComplete()) { return; }
+        
     // Redraw background
     setupBackground();
     
     // Draw the player
     player.run();
     
-    // Draw current zombie    
-    currentZombie.run();
+    // Draw current zombies 
+    for (int i = 0; i < currentZombies.size(); i++) { currentZombies.get(i).run(); }
     
     // Draw all dead zombies
     for (int i = 0; i < deadZombies.size(); i++) { deadZombies.get(i).draw(); }
     
     // Draw bullets
     for (int i = 0; i < bullets.size(); i++) { bullets.get(i).run(); }
+    
+    nextZombieInterval--;
 }
 
 // Capture keyboard events
@@ -253,17 +264,21 @@ class Bullet
         draw();
         x += speed;
        
-        if (x >= currentZombie.getX())
-        {   
-            if (currentZombie.tryToHit(key))
-            {
-                bullets.remove(0);
-            }
-        }
-        
         if (x >= width)
         {
             bullets.remove(0);
+        }
+        
+        for ( int i = 0; i < currentZombies.size(); i++)
+        {
+            if (x >= currentZombies.get(i).getX())
+            {
+                if (currentZombies.get(i).tryToHit(key))
+                {
+                    bullets.remove(0);
+                    break;
+                }
+            }
         }
     }
 }
@@ -509,4 +524,9 @@ class Zombie
     
     // Check if dead
     boolean isDead() { return dead; }
+}
+
+void updateNextZombieInterval()
+{
+    nextZombieInterval = Math.floor(Math.random() * (framerate * 2)) + (framerate * 1);
 }
