@@ -307,11 +307,11 @@ void completedGame()
     textFont(fontSerif);
     textSize(50);
     textAlign(CENTER);
-    text("You completed the game! Well done!", width / 2, height / 2);
+    text("You completed the game!", width / 2, height / 2);
 
     textSize(30);
     textAlign(CENTER);
-    text("Final Score: " + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
+    text("Final Score - $" + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
 }
 
 // Main Program Loop
