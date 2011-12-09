@@ -1,7 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/background-ground.jpg,img/dead-zombie.png"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/background-ground.png,img/dead-zombie.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,9 +73,8 @@ void setupBackground()
     background(sky); // Draw the sky
 
     // Draw the ground
-    fill(ground);
-    noStroke();
-    rect(0, height - 200, width, 200);
+    PImage b = loadImage("img/background-ground.png");
+    image(b, 0, height - 216);
 
     // Render the level    
     font = loadFont("serif");
