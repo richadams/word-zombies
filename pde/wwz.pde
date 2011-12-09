@@ -29,10 +29,10 @@ int currentState = GameState.MENU;
 Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
-int backgroundOffset = 0; 
-int backgroundLimit = height - 2000;
-int ammoRemaining = 30;
-int zombiesRemaining = 0;
+int backgroundOffset   = 0; 
+int backgroundLimit    = height - 2000;
+int ammoRemaining      = 0;
+int zombiesRemaining   = 0;
 
 // Score counters
 int totalScore = 0;
@@ -114,7 +114,7 @@ void setupBackground()
     fill(255);
     textSize(15);
     textAlign(RIGHT);
-    text("Score: " + totalScore + " Kills: " + totalKills + " ", width, 18);
+    text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
     
     // Render current ammo
     if (ammoRemaining == 0)
@@ -132,11 +132,11 @@ void setupBackground()
     text(str(ammoRemaining), ((width / 2) + 5), 18);
     
     // Render zombies reamining
-    image(imgZombieIcon, (width / 2) + 30, 2);
+    image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
     fill(255);
     textAlign(LEFT);
     textFont(loadFont("serifbold"))
-    text(str(zombiesRemaining), ((width / 2) + 55), 18);
+    text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
 // Show intro
@@ -186,6 +186,28 @@ void gameOver()
     text("Final Score: " + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
 }
 
+// Start Level
+void levelStartScreen()
+{
+    drawMessageArea();
+
+    fill(0);
+    font = loadFont("serif");
+    textFont(font);
+    textSize(50);
+    textAlign(CENTER);
+        
+    text("Level " + currentLevelNumber + ", Ready?", width / 2, height / 2);
+
+    textSize(30);
+    textAlign(CENTER);
+    text("You've been given " + currentLevel.getExtraAmmo() + " bullets.", width / 2, (height / 2) + 40);
+
+    textSize(20);
+    textAlign(CENTER);
+    text("Tap to start", width / 2, (height / 2) + 75);
+}
+
 // End of Level
 void endOfLevel()
 {
@@ -205,8 +227,7 @@ void endOfLevel()
     {
         text("You survived until daylight!", width/2, height/2 - 50);
     }
-    
-    
+        
     text("Level " + currentLevelNumber + " completed!", width / 2, height / 2);
 
     textSize(30);
@@ -244,6 +265,14 @@ void draw()
     {
         stop();
         showIntro();
+        return;
+    }
+    
+    // If level loaded
+    if (currentState == GameState.LEVEL_LOADED)
+    {
+        stop();
+        levelStartScreen();
         return;
     }
 
@@ -335,6 +364,9 @@ void mouseReleased()
             getLevel(currentLevelNumber);            
             audioMenu.pause();
             break;
+       case GameState.LEVEL_LOADED:
+            currentLevel.startLevel();
+            break;
     }
 }
 
@@ -347,7 +379,7 @@ void loadLevel(params)
     // Update state
     currentState = GameState.LOADING_LEVEL;
 
-    // Create a new leveg
+    // Create a new level
     currentLevel = new Level(currentLevelNumber);
 
     // Go over each line
@@ -355,14 +387,30 @@ void loadLevel(params)
     for (var i in words)
     {
         if (words[i] == "") { continue; }
+        
+        // Parse out specials
+        if (words[i].charAt(0) == "*")
+        {
+            var word = words[i].substring(1);
+            var sections = word.split(":");
+            
+            // Can't use switch with strings in JS
+            if (sections[0] == "newammo")
+            {
+                ammoRemaining += (int)sections[1];
+                currentLevel.setExtraAmmo((int)sections[1]);
+            }
+            
+            continue;
+        }
 
         var segments = words[i].split(" ");
         Zombie z = new Zombie(segments[0], segments[1]);
         currentLevel.addZombie(z);
     }
-
-    // Start the level
-    currentLevel.startLevel();
+    
+    currentState = GameState.LEVEL_LOADED;
+    start();
 }
 
 void loadLevelFailed()
@@ -380,6 +428,7 @@ class Level
     var audioComplete = new Audio("./audio/level-complete.mp3");
 
     int num;
+    int extraAmmo = 0;
     boolean completed = false;
 
     // ctor
@@ -448,6 +497,9 @@ class Level
         levelZombies.remove(0);
         return z;
     }
+    
+    void setExtraAmmo(int ammo) { extraAmmo = ammo; }
+    int getExtraAmmo() { return extraAmmo; }
 }
 
 // Player
