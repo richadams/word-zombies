@@ -20,6 +20,8 @@ boolean active = false;
 int currentLevelNumber = 1;
 Level currentLevel;
 
+int score = 0;
+
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void setup()
@@ -41,6 +43,14 @@ void setupBackground()
     fill(ground);
     noStroke();
     rect(0, height - 200, width, 200);
+    
+    // Render the score
+    font = loadFont("serif"); 
+    textFont(font);
+    fill(0);
+    textSize(20);
+    textAlign(RIGHT);
+    text("Score: " + score + " ", width, 20);
 }
 
 // Game over
@@ -55,6 +65,10 @@ void gameOver()
     textSize(50);
     textAlign(CENTER);
     text("GAME OVER", width / 2, height / 2);
+    
+    textSize(30);
+    textAlign(CENTER);
+    text("Final Score: " + score, width / 2, (height / 2) + 40);
     
     textSize(20);
     textAlign(CENTER);
@@ -74,9 +88,13 @@ void endOfLevel()
     textAlign(CENTER);
     text("Level " + currentLevelNumber + " completed.", width / 2, height / 2);
     
+    textSize(30);
+    textAlign(CENTER);
+    text("Score: " + score, width / 2, (height / 2) + 40);
+    
     textSize(20);
     textAlign(CENTER);
-    text("Press any key to continue", width / 2, (height / 2) + 55);
+    text("Press any key to continue", width / 2, (height / 2) + 75);
 }
 
 // Completed the game!!
@@ -388,15 +406,17 @@ class Zombie
     // Attempt to "hit" zombie with key
     void tryToHit(k)
     {        
-        // Now determine if it's the first letter.
+        // Is it a hit?
         if (nothit.indexOf(k) == 0)
         {
             hit += nothit.charAt(0);
             nothit = nothit.substring(1);
-        }
+            
+            score++;
         
-        // Determine if zombie should die
-        if (nothit == "") { kill(); }
+            // Determine if zombie should die
+            if (nothit == "") { kill(); }
+        }
     }
     
     // Member funcs
