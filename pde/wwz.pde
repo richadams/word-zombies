@@ -10,7 +10,8 @@ int height = 640;
 
 int framerate = 15;
 
-Zombie zom; // Only one zombie at a time, for now.
+ArrayList deadZombies = new ArrayList();
+Zombie currentZombie;
 Player player = new Player();
 
 // Is game active yet?
@@ -79,11 +80,11 @@ void draw()
     }
 
     // If there's no zombie or our zombie died, introduce a new one
-    if (zom == null 
-        || zom.isDead())
+    if (currentZombie == null 
+        || currentZombie.isDead())
     {
-        zom = new Zombie(words[currentWord], 25);
-        currentWord++;
+        currentZombie = currentLevel.getNextZombie();
+        //new Zombie(words[currentWord], 25);
         
         // If there are no more words, ?? level over?
     }
@@ -95,7 +96,21 @@ void draw()
     player.run();
     
     // Draw current zombie    
-    zom.run();
+    currentZombie.run();
+    
+    // Draw all dead zombies
+    for (int i = 0; i < deadZombies.size(); i++) { deadZombies.get(i).draw(); }
+}
+
+// Capture keyboard events
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void keyReleased() 
+{
+    if (str(key).toUpperCase() == "Q")
+    { 
+        // Kill current zombie
+        currentZombie.kill();
+    }
 }
 
 
@@ -103,19 +118,24 @@ void draw()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void loadLevel(params)
 {
-    // Params are in form "WORD SPEED\n";    
+    // Params are in form "WORD SPEED\n";
     
     // Create a new leve
     currentLevel = new Level(currentLevelNumber);
     
     // Go over each line
     var words = params.split("\n");
-    for (var w in words)
+    for (var i in words)
     {
-        var segments = w.split(" ");
+        if (words[i] == "") { continue; }
+        
+        var segments = words[i].split(" ");
         Zombie z = new Zombie(segments[0], segments[1]);
         currentLevel.addZombie(z);
     }
+    
+    // Start the level
+    currentLevel.start();
 }
 
 void loadLevelFailed()
@@ -132,6 +152,8 @@ class Level
     int num;
     boolean complete = false;
     
+    int currentZombie = 0;
+    
     // ctor   
     Level(int levelNumber) 
     {
@@ -139,12 +161,37 @@ class Level
     }
     
     // Add a zombie
-    void addZombie(Zombie z) { zombies.add(z); }
+    void addZombie(Zombie z) 
+    { 
+        //alert("Adding zombie - " + z.getWord() + ", " + z.getSpeed());
+        zombies.add(z); 
+    }
+    
+    // Start the level
+    void start()
+    {
+        zombie = getNextZombie();
+        active = true;
+    }
     
     // Member functions
     boolean isComplete() { return complete; }
     void complete() { complete = true; }
-    //Zombie getNextZombie() { }
+    Zombie getNextZombie()
+    {
+        // No more zombies!
+        if (currentZombie == zombies.size)
+        {
+            complete();
+            return null;
+        }
+        
+        // Otherwise, return next zombie and increment counter
+        Zombie z = zombies.get(currentZombie);
+        currentZombie++;
+        
+        return z;
+    }
 }
 
 // Player
@@ -201,8 +248,6 @@ class Zombie
         // Initial position
         x = width;
         y = height-300;
-        
-        draw();
     }
     
     // Main activity loop for the zombie
@@ -214,22 +259,37 @@ class Zombie
     
     // Draws a zombie object
     void draw()
-    {        
-        // Draw zombie
-        fill(0);
-        stroke(255);
-        ellipse(x, y, zWidth, zHeight);
-        
-        // Draw the word above the zombie
-        font = loadFont("serif"); 
-        textFont(font);
-        textSize(20);
-        text(word, x - (zWidth / 2), y - zHeight); 
+    {
+        // Alive Zombie
+        if (!dead)
+        {  
+            // Draw zombie              
+            fill(0);
+            stroke(255);
+            ellipse(x, y, zWidth, zHeight);
+            
+            // Draw the word above the zombie
+            font = loadFont("serif"); 
+            textFont(font);
+            textSize(20);
+            text(word, x - (zWidth / 2), y - zHeight); 
+        }
+        // Dead Zombie
+        else
+        {
+            // Draw zombie              
+            fill(255, 0, 0);
+            stroke(255);
+            ellipse(x, y, zWidth, zHeight);
+        }
     }
     
     // Updates the position and state of a zombie object
     void update()
     {
+        // Dead zombie can't update
+        if (isDead()) { return; }
+    
         // if goes off left side, then kill self.
         if (x <= 0) { kill(); }
     
@@ -246,7 +306,15 @@ class Zombie
     int getSpeed() { return speed; }
     
     // Zombie is killed
-    void kill() { dead = true; }
+    void kill() 
+    { 
+        deadZombies.add(this);
+        dead = true; 
+        
+        // Lower to ground
+        y += 160;
+        zHeight -= 20;
+    }
     
     // Check if dead
     boolean isDead() { return dead; }
