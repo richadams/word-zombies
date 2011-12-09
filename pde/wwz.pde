@@ -1,21 +1,21 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
 // Preload images
-/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg"; */
+/* @pjs preload="img/player.png,img/zombie.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Game Setup
-int width     = 960;
+int width     = 768;
 int height    = 640;
 int framerate = 15;
 
 // Colors
 color red                = #ff0000;
 color letterBlockBG      = #FFAE56;
-color letterBlockBGHit   = #FF3E3E;
-color letterBlockOutline = #ffffff;
+color letterBlockBGHit   = #FF0000;
+color letterBlockOutline = #000000;
 
 // Game Elements
 int deadZombies   = 0;
@@ -51,9 +51,11 @@ int messageHeight = 200;
 PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
 PImage imgBackgroundGround = loadImage("img/background-ground.png");
 PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
+PImage imgAmmoIconBlack    = loadImage("img/icons/ammo-black.png");
 PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
 PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
 PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg"); 
+PImage imgMoneyIcon        = loadImage("img/icons/money.png"); 
 
 // Audio
 var audioMenu     = new Audio("./audio/menu.mp3");    
@@ -88,6 +90,23 @@ void start()
 {
     var instance = Processing.getInstanceById("wwz");
     instance.loop();
+}
+
+// Start a new game
+void newGame()
+{
+    // Reset counters
+    totalScore         = 0;
+    levelScore         = 0;
+    totalKills         = 0;
+    levelKills         = 0;
+    ammoRemaining      = 0;
+    zombiesRemaining   = 0;
+    currentLevelNumber = 1;
+    
+    // Put into correct state, and start
+    currentState = GameState.MENU;
+    start();
 }
 
 // Drawing
@@ -160,13 +179,15 @@ void showIntro()
 
     textSize(20);
     textAlign(CENTER);
-    text("Tap to start!", width / 2, (height / 2) + 75);
+    text("Tap screen to start!", width / 2, (height / 2) + 75);
 }
 
 void drawMessageArea()
 {
-    stroke(0);
-    strokeWeight(2);
+    // Drop Shadow
+    fill(0);
+    rect((width / 2) - (messageWidth / 2) + 5, (height / 2) - (messageHeight /2) + 5, messageWidth, messageHeight);
+    
     fill(255);
     rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight);
 }
@@ -178,22 +199,36 @@ void gameOver()
 
     image(imgBackgroundOver, 0, 0);
     
+    drawMessageArea();
+    
     fill(0);
-
     font = loadFont("serif");
     textFont(font);
     textSize(50);
     textAlign(CENTER);
-    text("GAME OVER", width / 2, height / 2);
+    text("GAME OVER", width / 2, (height / 2) - 40);
+        
+    textSize(25);
+    textAlign(LEFT);
+    text("Final Score:", width / 2 - (messageWidth / 2) + 100, (height / 2));
 
-    textSize(30);
+    textSize(20);
+    textAlign(LEFT);
+    image(imgMoneyIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) + 10);
+    text ("You earned $" + levelScore + ".", width / 2 - (messageWidth / 2) + 100, (height/2) + 30);
+    image(imgZombieIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) + 33);
+    text ("You 'took care' of " + levelKills + " undead.", width / 2 - (messageWidth / 2) + 100, (height/2) + 50);
+    
+    textSize(16);
     textAlign(CENTER);
-    text("Final Score: " + totalScore + " Kills: " + totalKills, width / 2, (height / 2) + 40);
+    text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
 }
 
 // Start Level
 void levelStartScreen()
 {
+    if (audioMenu.paused) { audioMenu.play(); } // Restart menu audio.
+
     drawMessageArea();
 
     fill(0);
@@ -202,15 +237,18 @@ void levelStartScreen()
     textSize(50);
     textAlign(CENTER);
         
-    text("Level " + currentLevelNumber + ", Ready?", width / 2, height / 2);
+    text("Level " + currentLevelNumber + ", Ready?", width / 2, height / 2 - 40);
 
-    textSize(30);
-    textAlign(CENTER);
-    text("You've been given " + currentLevel.getExtraAmmo() + " bullets.", width / 2, (height / 2) + 40);
+    textSize(22);
+    textAlign(LEFT);
+    image(imgAmmoIconBlack, width / 2 - (messageWidth / 2) + 75, (height / 2) - 17);
+    text("You've been given " + currentLevel.getExtraAmmo() + " bullets.", width / 2 - (messageWidth / 2) + 100, (height / 2));
+    image(imgZombieIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) + 8);
+    text("There are " + currentLevel.totalZombies() + " zombies to 'take care' of.", width / 2 - (messageWidth / 2) + 100, (height / 2) + 25);
 
     textSize(20);
     textAlign(CENTER);
-    text("Tap to start", width / 2, (height / 2) + 75);
+    text("Tap screen to begin!", width / 2, (height / 2) + 75);
 }
 
 // End of Level
@@ -223,25 +261,29 @@ void endOfLevel()
     textFont(font);
     textSize(50);
     textAlign(CENTER);
+    text("Level " + currentLevelNumber + " completed!", width / 2, (height / 2) - 50);
+
+    textSize(20);
+    textAlign(CENTER);     
     
     if (currentState == GameState.END_LEVEL_ALL_DEAD)
     {
-        text("You killed all the zombies!", width/2, height/2 - 50);
+        text("You killed all the zombies!", width/2, (height/2) - 20);
     }
     else if (currentState == GameState.END_LEVEL_DAYLIGHT)
     {
-        text("You survived until daylight!", width/2, height/2 - 50);
+        text("You survived until daylight!", width/2, (height/2) - 20);
     }
-        
-    text("Level " + currentLevelNumber + " completed!", width / 2, height / 2);
-
-    textSize(30);
-    textAlign(CENTER);
-    text("Score: " + levelScore + " (Total: " + totalScore + ") Kills: " + levelKills + " (Total: " + totalKills + ")", width / 2, (height / 2) + 40);
+    
+    textAlign(LEFT);
+    image(imgMoneyIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) - 5);
+    text ("You earned $" + levelScore + ".", width / 2 - (messageWidth / 2) + 100, (height/2) + 15);
+    image(imgZombieIcon, width / 2 - (messageWidth / 2) + 75, (height / 2) + 18);
+    text ("You 'took care' of " + levelKills + " undead.", width / 2 - (messageWidth / 2) + 100, (height/2) + 35);
 
     textSize(20);
     textAlign(CENTER);
-    text("Tap to continue", width / 2, (height / 2) + 75);
+    text("Tap screen to continue to level " + (currentLevelNumber+1) + "!", width / 2, (height / 2) + 75);
 }
 
 // Completed the game!!
@@ -366,11 +408,13 @@ void mouseReleased()
         case GameState.END_LEVEL_DAYLIGHT:
             currentLevelNumber++; // Increment level, cascade to next option
         case GameState.MENU:
-            getLevel(currentLevelNumber);            
-            audioMenu.pause();
+            getLevel(currentLevelNumber);
             break;
        case GameState.LEVEL_LOADED:
             currentLevel.startLevel();
+            break;
+       case GameState.GAME_OVER:
+            newGame();
             break;
     }
 }
@@ -476,7 +520,8 @@ class Level
 
         // Start the game
         currentState = GameState.IN_GAME;
-        zombiesRemaining = levelZombies.size();
+        zombiesRemaining = levelZombies.size();            
+        audioMenu.pause();
 
         // Restart the loop
         start();
@@ -728,7 +773,7 @@ class Letter
     void draw()
     {
         // Determine position
-        x = z.getX()  + (z.getWidth()/2) - (z.getWord().length * (width + spacing)) + (pos * (width + spacing));
+        x = z.getX()  + ((z.getWord().length/2) * (width + spacing)) - (z.getWord().length * (width + spacing)) + (pos * (width + spacing));
         y = z.getY() - (z.getHeight() / 2) - 40;
     
         // Block
