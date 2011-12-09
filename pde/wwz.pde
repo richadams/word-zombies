@@ -1,5 +1,7 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
+/* @pjs preload="img/zombie.jpg"; */
+
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 color sky = #5BA0FA;
@@ -386,8 +388,10 @@ class Zombie
     int y;
     
     // So we can tweak values later
-    int zWidth = 50;
-    int zHeight = 50;
+    int zWidth = 137;
+    int zHeight = 200;
+    
+    int heightOffset = 0; // Random height offset to give 3d-ish appearance
     
     // Ctor
     Zombie(String w, float s)
@@ -396,9 +400,11 @@ class Zombie
         word  = w;
         nothit = word;
         
+        heightOffset = (Math.random()*100) - 70;
+        
         // Initial position
         x = width;
-        y = height-300;
+        y = height - (zHeight / 2) - 100 + heightOffset;
     }
     
     // Main activity loop for the zombie
@@ -415,9 +421,12 @@ class Zombie
         if (!dead)
         {  
             // Draw zombie              
-            fill(0);
-            stroke(255);
-            ellipse(x, y, zWidth, zHeight);
+            //fill(0);
+            //stroke(255);
+            //ellipse(x, y, zWidth, zHeight);
+            PImage b;
+            PImage b = loadImage("img/zombie.jpg");
+            image(b, x - (zWidth / 2), y - (zHeight / 2));
             
             // Draw the word above the zombie
             font = loadFont("monospace");
@@ -425,10 +434,10 @@ class Zombie
             textFont(font);
             textAlign(LEFT);
             textSize(50);
-            text(hit, x - (textWidth(word) / 2), y - zHeight);
+            text(hit, x - (textWidth(word) / 2), y - (zHeight / 2) - 15);
                         
             fill(255);
-            text(nothit, x - (textWidth(word) / 2) + textWidth(hit) , y - zHeight); 
+            text(nothit, x - (textWidth(word) / 2) + textWidth(hit) , y - (zHeight/2) - 15); 
         }
         // Dead Zombie
         else
@@ -436,7 +445,7 @@ class Zombie
             // Draw zombie              
             fill(255, 0, 0);
             stroke(255);
-            ellipse(x, y, zWidth, zHeight);
+            ellipse(x, y, 100, 10);
         }
     }
     
