@@ -1,5 +1,6 @@
-// Zombie
-////////////////////////////////////////////////////////////////////////////////////////////////////
+// The zombie class, this controls the zombie position, animation and the logic behind whether a
+// bullet as "hit" or not.
+
 class Zombie
 {
     // Members
@@ -8,10 +9,12 @@ class Zombie
     String zType;
     boolean dead = false;
 
+    // Audio
     boolean playedIntro = false;
     var audioBegin;
     var audioDie;
 
+    // Letters
     ArrayList letters = new ArrayList();
     Letter nextLetter;
     int hitPosition = 0;
@@ -20,6 +23,7 @@ class Zombie
     int zWidth  = 200;
     int zHeight = 260;
 
+    // Animation
     int animationFrame = 0;
     int stepCounter = 0;
 
@@ -29,12 +33,12 @@ class Zombie
 
     int heightOffset = 0; // Random height offset to give 3d-ish appearance
 
-    // Ctor
+    // Constructor
     Zombie(String w, float s, String t)
     {
         speed = s;
         word  = w;
-        zType  = t;
+        zType = t;
 
         if (audioEnabled)
         {
@@ -42,13 +46,15 @@ class Zombie
             audioDie   = new Audio("./audio/zombie-die.mp3");
         }
 
-        // Construct the letters
+        // Construct the letter objects
         for (int i = 0; i < word.length; i++)
         {
             letters.add(new Letter(this, str(word.charAt(i)), i));
         }
         nextLetter = letters.get(hitPosition);
 
+        // Height offset is to randomize the 3D position of the zombie.. are they further back or
+        // forward on the screen. So they're not all coming in at the same point.
         heightOffset = (Math.random()*100) - 70;
 
         // Initial position
@@ -71,6 +77,7 @@ class Zombie
         // Alive Zombie
         if (!dead)
         {
+            // Determine the animation frame.
             if (stepCounter % zombieAnimationSpeed == 0) { animationFrame++; }
             if (animationFrame == zombieFrames) { animationFrame = 0; }
 
@@ -95,7 +102,7 @@ class Zombie
         // Dead zombie can't update
         if (dead) { return; }
 
-        // if goes off left side, then kill self.
+        // If goes off left side, then kill self.
         if (x <= 0) { kill(); }
 
         // If collides with player, then kill player
@@ -110,10 +117,11 @@ class Zombie
         // Is it a hit?
         if (letters.get(hitPosition).getLetter() == k)
         {
+            // Update the letter object so it changes state.
             letters.get(hitPosition).hit();
 
+            // Update counters
             hitPosition++;
-
             totalScore++;
             levelScore++;
 
@@ -121,6 +129,8 @@ class Zombie
             if (hitPosition == letters.size())
             {
                 kill();
+                
+                // Update score and counters.
                 totalScore += 10;
                 levelScore += 10;
                 totalKills++;
@@ -128,21 +138,21 @@ class Zombie
                 zombiesRemaining--;
             }
 
-            return true;
+            return true; // Hit
         }
 
-        return false;
+        return false; // Miss
     }
 
     // Member funcs
-    int getWidth() { return zWidth; }
-    int getHeight() { return zHeight; }
+    int getWidth()   { return zWidth; }
+    int getHeight()  { return zHeight; }
     String getWord() { return word; }
-    int getSpeed() { return speed; }
-    int getX() { return x; }
-    int getY() { return y; }
+    int getSpeed()   { return speed; }
+    int getX()       { return x; }
+    int getY()       { return y; }
 
-    // Zombie is killed
+    // Zombie death handling
     void kill()
     {
         if (audioEnabled) { audioDie.play(); }

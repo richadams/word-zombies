@@ -1,52 +1,6 @@
-// Drawing
-////////////////////////////////////////////////////////////////////////////////////////////////////
+// These are the various "screens" that can popup throughout the game.
 
-void setupBackground()
-{
-    // Draw the sky
-    image(imgBackgroundSky, 0, backgroundOffset);
-
-    // Draw the ground
-    image(imgBackgroundGround, 0, height - 216);
-
-    // Score bar
-    stroke(0);
-    strokeWeight(1);
-    fill(0);
-    rect(0, 0, width, 24);
-
-    // Render the level
-    textFont(fontSerif);
-    fill(255);
-    textSize(15);
-    textAlign(LEFT);
-    text(" Level: " + currentLevelNumber, 0, 18);
-
-    // Render the score
-    textAlign(RIGHT);
-    text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
-
-    // Render current ammo
-    if (ammoRemaining == 0)
-    {
-        image(imgAmmoEmptyIcon, (width / 2) - 20, 2);
-        fill(red);
-    }
-    else
-    {
-        image(imgAmmoIcon, (width / 2) - 20, 2);
-        fill(255);
-    }
-    textAlign(LEFT);
-    text(str(ammoRemaining), ((width / 2) + 5), 18);
-
-    // Render zombies reamining
-    image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
-    fill(255);
-    text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
-}
-
-// Show intro
+// The main intro screen, shows the backdrop and a message to tap.
 void showIntro()
 {
     if (audioEnabled) { audioMenu.play(); }
@@ -61,6 +15,7 @@ void showIntro()
     text("Tap screen to start a new game!", width / 2, (height / 2) + 280);
 }
 
+// This draws the white rectangle popup on the page, with a fancy drop shadow.
 void drawMessageArea()
 {
     // Drop Shadow
@@ -71,7 +26,7 @@ void drawMessageArea()
     rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight);
 }
 
-// Game over
+// The game over screen, plays the relevant audio and shows the score status.
 void gameOver()
 {
     if (audioEnabled) { audioGameOver.play(); }
@@ -102,7 +57,8 @@ void gameOver()
     text("Tap screen to start a new game!", width / 2, (height / 2) + 80);
 }
 
-// Start Level
+// The level start screen. Shows how many zombies there will be, and how much extra ammo the player
+// gets.
 void levelStartScreen()
 {
     if (audioEnabled) { if (audioMenu.paused) { audioMenu.play(); } } // Restart menu audio.
@@ -128,7 +84,7 @@ void levelStartScreen()
     text("Tap screen to begin!", width / 2, (height / 2) + 75);
 }
 
-// End of Level
+// End of Level, shows the score and how the level ended (all zombies killed, or daylight arrived).
 void endOfLevel()
 {
     drawMessageArea();
@@ -162,7 +118,8 @@ void endOfLevel()
     text("Tap screen to continue to level " + (currentLevelNumber+1) + "!", width / 2, (height / 2) + 75);
 }
 
-// Completed the game!!
+// Completed the game!! Impossible to reach in the demo due to level 3, but will work if you give
+// proper level definitions. Could have a scoreboard and stuff here.
 void completedGame()
 {
     background(0);

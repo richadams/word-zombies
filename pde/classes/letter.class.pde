@@ -28,9 +28,11 @@ class Letter
     void draw()
     {
         // Determine position
-        x = z.getX() - ((z.getWord().length/2) * (width + spacing)) + (pos * (width + spacing));
+        x = z.getX() // Zombie location on x -axis
+            - ((z.getWord().length/2) * (width + spacing)) // Minus half the length of the word number of letter blocks
+            + (pos * (width + spacing)); // Plus this letter's position number of letter blocks.
         
-        y = z.getY() - (z.getHeight() / 2) - 40;
+        y = z.getY() - (z.getHeight() / 2) - 40; // 40px above Zombie's top.
 
         // Block
         fill(((h) ? letterBlockBGHit : letterBlockBG));

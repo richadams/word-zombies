@@ -9,18 +9,19 @@ var instance;
 // Want to use "include" style syntax for Processing JS file, easier to maintain.
 var processingFiles = ""; function include(filename) { processingFiles += "./pde/" + filename + " "; }
 
-// Main game
-include("wz.pde");
-
+// Setup
+include("attribs.pde");
+include("functions.pde");
 // Classes
-include("bullet.class.pde");
-include("player.class.pde");
-include("zombie.class.pde");
-include("letter.class.pde");
-include("level.class.pde");
-
+include("classes/bullet.class.pde");
+include("classes/player.class.pde");
+include("classes/zombie.class.pde");
+include("classes/letter.class.pde");
+include("classes/level.class.pde");
 // Screens
 include("screens.pde");
+// Main game
+include("wz.pde");
 
 // State
 ////////////////////////////////////////////////////////////////////////////////////////////////////

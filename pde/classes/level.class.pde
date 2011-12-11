@@ -1,16 +1,15 @@
-// Level
-////////////////////////////////////////////////////////////////////////////////////////////////////
+// This class deals with keeping control of the current level. Giving out new zombies, etc.
+
 class Level
 {
+    // Members
     ArrayList levelZombies = new ArrayList();
-
     var audioComplete;
-
-    int num;
+    int num; // Level number
     int extraAmmo = 0;
     boolean completed = false;
 
-    // ctor
+    // Constructor
     Level(int levelNumber)
     {
         num = levelNumber;
@@ -36,12 +35,12 @@ class Level
         // Clear level score counters
         levelScore = 0; levelKills = 0;
 
-        // Randomize zombies!
+        // Randomize zombies! A not very smart shuffler.
         var shuffled = levelZombies.toArray();
         for (int i = 0; i < levelZombies.size(); i++)
         {
-            int n = Math.floor(Math.random()*levelZombies.size());
-            var tmp = shuffled[n];
+            int n       = Math.floor(Math.random()*levelZombies.size());
+            var tmp     = shuffled[n];
             shuffled[n] = shuffled[i];
             shuffled[i] = tmp;
         }
@@ -54,7 +53,7 @@ class Level
         }
 
         // Start the game
-        currentState = GameState.IN_GAME;
+        currentState     = GameState.IN_GAME;
         zombiesRemaining = levelZombies.size();
         if (audioEnabled) { audioMenu.pause(); }
 
@@ -62,15 +61,16 @@ class Level
         start();
     }
 
-    // Member functions
+    // Completion functions
     boolean isComplete() { return completed; }
-    int totalZombies() { return levelZombies.size(); }
     void complete()
     {
         completed = true;
         if (audioEnabled) { audioComplete.play(); }
     }
 
+    // Zombie handling
+    int totalZombies()      { return levelZombies.size(); }
     boolean isMoreZombies() { return (levelZombies.size() != 0); }
     Zombie getNextZombie()
     {
@@ -83,6 +83,7 @@ class Level
         return z;
     }
 
+    // Ammo handling
     void setExtraAmmo(int ammo) { extraAmmo = ammo; }
-    int getExtraAmmo() { return extraAmmo; }
+    int getExtraAmmo()          { return extraAmmo; }
 }

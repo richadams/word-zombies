@@ -1,76 +1,6 @@
 // Words with Zombies - Gravity Hackathon Prototype
 
-// Preload images
-/* @pjs preload="img/menu.jpg,img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
-
-// Attribs
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Game Setup
-int width     = 768;
-int height    = 640;
-int framerate = 20;
-
-// Colors
-color red                = #ff0000;
-color letterBlockBG      = #FFAE56;
-color letterBlockBGHit   = #FF0000;
-color letterBlockOutline = #000000;
-color bullet             = #FF9622;
-
-// Game Elements
-int deadZombies   = 0;
-ArrayList zombies = new ArrayList();
-Player player     = new Player();
-ArrayList bullets = new ArrayList();
-
-// Game Settings
-int backgroundSpeed      = 1;
-int bulletSpeed          = 100;
-int zombieAnimationSpeed = 3; // Higher = slower
-int zombieFrames         = 3;
-
-boolean audioEnabled     = false;
-
-// Game State
-int currentState = GameState.MENU;
-Level currentLevel;
-int currentLevelNumber = 1;
-int nextZombieInterval = 0;
-int backgroundOffset   = 0;
-int backgroundLimit    = height - 2000;
-int ammoRemaining      = 0;
-int zombiesRemaining   = 0;
-
-// Score counters
-int totalScore = 0;
-int levelScore = 0;
-int totalKills = 0;
-int levelKills = 0;
-
-// Messages
-int messageWidth  = 600;
-int messageHeight = 200;
-
-// Images
-PImage imgMenu             = loadImage("img/menu.jpg");
-PImage imgBackgroundSky    = loadImage("img/background-sky.jpg");
-PImage imgBackgroundGround = loadImage("img/background-ground.png");
-PImage imgAmmoIcon         = loadImage("img/icons/ammo.png");
-PImage imgAmmoIconBlack    = loadImage("img/icons/ammo-black.png");
-PImage imgAmmoEmptyIcon    = loadImage("img/icons/ammo-empty.png");
-PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
-PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg");
-PImage imgMoneyIcon        = loadImage("img/icons/money.png");
-PImage imgPlayer           = loadImage("img/player.png");
-
-// Audio
-var audioMenu;
-var audioBullet;
-var audioGameOver;
-
-// Fonts
-var fontSerif     = loadFont("serifbold");
+// This file contains the main game logic and methods.
 
 // Setup
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,9 +9,8 @@ void setup()
     size(width, height);
     frameRate(framerate);
     
-    var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-    
-    if (is_chrome) 
+    // If chrome, then hide the keyboard and enable sounds.    
+    if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1) 
     { 
         audioEnabled = true;
         $("#keyboard").css("display", "none");
@@ -96,48 +25,27 @@ void setup()
     }
 }
 
-// Helper Functions
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-// Start and stop animation processing
-void stop()  { Processing.getInstanceById("wz").noLoop(); }
-void start() { Processing.getInstanceById("wz").loop(); }
-
 // Main Program Loop
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 void draw()
 {
-    // If menu
-    if (currentState == GameState.MENU)
+    // What happens will depend on game state
+    switch(currentState)
     {
-        stop();
-        showIntro();
-        return;
-    }
-
-    // If level loaded
-    if (currentState == GameState.LEVEL_LOADED)
-    {
-        stop();
-        levelStartScreen();
-        return;
-    }
-
-    // If end of level
-    if (currentState == GameState.END_LEVEL_ALL_DEAD
-        || currentState == GameState.END_LEVEL_DAYLIGHT)
-    {
-        stop();
-        endOfLevel();
-        return;
-    }
-
-    // If game over
-    if (currentState == GameState.GAME_OVER)
-    {
-        stop();
-        gameOver();
-        return;
+        // Main game screens
+        case GameState.MENU:
+            stop(); showIntro(); return;
+            break;
+        case GameState.LEVEL_LOADED:
+            stop(); levelStartScreen(); return;
+            break;
+        case GameState.END_LEVEL_ALL_DEAD:
+        case GameState.END_LEVEL_DAYLIGHT:
+            stop(); endOfLevel(); return;
+            break;
+        case GameState.GAME_OVER:
+            stop(); gameOver(); return;
+            break;
     }
 
     // Don't run rest while game isn't active.
@@ -180,8 +88,57 @@ void draw()
     // Draw bullets
     for (int i = 0; i < bullets.size(); i++) { bullets.get(i).run(); }
 
+    // Update state
     nextZombieInterval--;
     backgroundOffset -= backgroundSpeed;
+}
+
+
+// This sets up the game background and score board.
+////////////////////////////////////////////////////////////////////////////////////////////////////
+void setupBackground()
+{
+    // Draw the sky
+    image(imgBackgroundSky, 0, backgroundOffset);
+
+    // Draw the ground
+    image(imgBackgroundGround, 0, height - 216);
+
+    // Score bar
+    stroke(0);
+    strokeWeight(1);
+    fill(0);
+    rect(0, 0, width, 24);
+
+    // Render the level
+    textFont(fontSerif);
+    fill(255);
+    textSize(15);
+    textAlign(LEFT);
+    text(" Level: " + currentLevelNumber, 0, 18);
+
+    // Render the score
+    textAlign(RIGHT);
+    text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
+
+    // Render current ammo
+    if (ammoRemaining == 0)
+    {
+        image(imgAmmoEmptyIcon, (width / 2) - 20, 2);
+        fill(red);
+    }
+    else
+    {
+        image(imgAmmoIcon, (width / 2) - 20, 2);
+        fill(255);
+    }
+    textAlign(LEFT);
+    text(str(ammoRemaining), ((width / 2) + 5), 18);
+
+    // Render zombies reamining
+    image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
+    fill(255);
+    text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
 // Capture Events
@@ -227,6 +184,26 @@ void mouseReleased()
 
 // Level Loading
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Function to grab level information for WWZ via AJAX
+function getLevel(level)
+{
+    // Retrieve the file
+    $.ajax({
+        url: "./levels/" + level,
+        success: function(response)
+        {
+            var p = Processing.getInstanceById("wz");
+            p.loadLevel(response);
+        },
+        error: function(response)
+        {
+            var p = Processing.getInstanceById("wz");
+            p.loadLevelFailed();
+        }        
+    });
+}
+
 void loadLevel(params)
 {
     // Params are in form "WORD SPEED\n";
@@ -292,26 +269,8 @@ void newGame()
     start();
 }
 
+// Updates the interval at which the next zombie will appear.
 void updateNextZombieInterval()
 {
     nextZombieInterval = Math.floor(Math.random() * (framerate * 2)) + (framerate * 1);
-}
-
-// Function to grab level information for WWZ via AJAX
-function getLevel(level)
-{
-    // Retrieve the file
-    $.ajax({
-        url: "./levels/" + level,
-        success: function(response)
-        {
-            var p = Processing.getInstanceById("wz");
-            p.loadLevel(response);
-        },
-        error: function(response)
-        {
-            var p = Processing.getInstanceById("wz");
-            p.loadLevelFailed();
-        }        
-    });
 }
