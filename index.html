@@ -2,106 +2,29 @@
 <head>
     <title>Word Zombies</title>    
     
-    <script src="./js/jquery-1.7.1.min.js"></script>
-    <script src="./js/wwz.js"></script>
-    <script src="./js/processing.js"></script>
+    <!-- Stylesheets -->
+    <link rel="stylesheet" type="text/css" media="all" href="./css/main.css" />
     
-    <style>
-        * { 
-            margin: 0px; 
-            padding: 0px; 
-        }
-        
-        body {
-            background: #000;
-        }
-        
-        canvas {
-            height: 640px;
-        }
-        
-        #user-input { 
-            display: block;
-            border: none;
-            width: 768px;
-            height: 400px;
-            background: #000;
-        }
-        
-        #keyboard {
-            width: 768px;
-            background: #000;
-            padding-top: 60px;
-        }
-        
-        #keyboard input {
-            width: 65px;
-            height: 65px;
-            font-size: 1.3em;
-            font-weight: bold;
-            margin: 3px !important;
-        }
-        
-        #keyboard .row {
-            text-align: center;
-            padding-bottom: 15px;
-        }
-        
-        input[type=submit] {
-            border: 1px solid #a9a9a9;
-            padding: 3px;
-            background: #f5f5f5;
-            font-size: 1em;
-            font-weight: normal;
-            -moz-border-radius: 3px;
-            -webkit-border-radius: 3px;
-            background-image: -webkit-gradient(
-                linear,
-                left bottom,
-                left top,
-                color-stop(0.44, rgb(223,223,223)),
-                color-stop(0.72, rgb(245,245,245))
-            );
-            background-image: -moz-linear-gradient(
-                center bottom,
-                rgb(223,223,223) 44%,
-                rgb(245,245,245) 72%
-            );
-        }
-
-        input[type=submit]:active {
-            background: #dfdfdf;
-            background-image: -webkit-gradient(
-                linear,
-                left bottom,
-                left top,
-                color-stop(0.44, rgb(245,245,245)),
-                color-stop(0.72, rgb(223,223,223))
-            );
-            background-image: -moz-linear-gradient(
-                center bottom,
-                rgb(245,245,245) 44%,
-                rgb(223,223,223) 72%
-            );
-        }
-
-        input[type=submit]:hover {
-            border: 1px solid #7f7f7f;
-        }
-
-    </style>  
+    <!-- JavaScript -->
+    <script type="text/javascript" src="./js/lib/jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="./js/lib/processing.js"></script>
+    <script type="text/javascript" src="./js/wz.js"></script>
     
-    <!-- Make it better on a phone -->
-    <meta name="apple-mobile-web-app-capable" content="yes" /> 
+    <!-- Phone Meta -->
+    <meta name="apple-mobile-web-app-capable"          content="yes" /> 
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <link rel="apple-touch-icon" href="touch-icon-iphone.png" />
-    <link rel="apple-touch-icon" sizes="72x72" href="touch-icon-ipad.png" />
-    <link rel="apple-touch-icon" sizes="114x114" href="touch-icon-iphone4.png" />
-    <link rel="apple-touch-startup-image" href="splash.jpg" /> 
+    <meta name="viewport"                              content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Phone Icons -->
+    <link rel="apple-touch-icon"          href="./img/apple/touch-icon-iphone.png" />
+    <link rel="apple-touch-icon"          href="./img/apple/touch-icon-ipad.png"    sizes="72x72" />
+    <link rel="apple-touch-icon"          href="./img/apple/touch-icon-iphone4.png" sizes="114x114" />
+    <link rel="apple-touch-startup-image" href="./img/apple/splash.jpg" /> 
 </head>
 <body>
-    <canvas id="wwz" data-processing-sources="./pde/wwz.pde"></canvas>    
+
+    <canvas id="wz" data-processing-sources="./pde/wz.pde"></canvas>
+       
     <div id="keyboard">
         <div class="row">
             <input type="submit" value="Q" />

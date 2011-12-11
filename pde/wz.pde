@@ -107,13 +107,13 @@ void setup()
 void stop()
 {
 
-    var instance = Processing.getInstanceById("wwz");
+    var instance = Processing.getInstanceById("wz");
     instance.noLoop();
 }
 
 void start()
 {
-    var instance = Processing.getInstanceById("wwz");
+    var instance = Processing.getInstanceById("wz");
     instance.loop();
 }
 

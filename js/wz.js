@@ -11,12 +11,12 @@ function getLevel(level)
         url: "./levels/" + level,
         success: function(response)
         {
-            var p = Processing.getInstanceById("wwz");
+            var p = Processing.getInstanceById("wz");
             p.loadLevel(response);
         },
         error: function(response)
         {
-            var p = Processing.getInstanceById("wwz");
+            var p = Processing.getInstanceById("wz");
             p.loadLevelFailed();
         }        
     });
@@ -27,7 +27,7 @@ $(document).ready(function ()
 {
     $("#keyboard input[type=submit]").bind("touchstart", function()
     {
-        var p = Processing.getInstanceById("wwz");
+        var p = Processing.getInstanceById("wz");
         p.keyboardPress($(this).attr("value"));
     });
 });
