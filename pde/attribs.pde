@@ -1,7 +1,7 @@
 // Attibutes used throughout the application.
 
 // Preload images
-/* @pjs preload="img/menu.jpg,img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png"; */
+/* @pjs preload="img/menu.jpg,img/player.png,img/zombies/slow_0.png,img/zombies/slow_1.png,img/zombies/slow_2.png,img/zombies/fast_0.png,img/zombies/fast_1.png,img/zombies/fast_2.png,img/dead-zombie.png,img/background-ground.png,img/background-sky.jpg,img/icons/ammo.png,img/icons/ammo-black.png,img/icons/ammo-empty.png,img/icons/zombie.png,img/background-game-over.jpg,img/icons/money.png,img/bullet.png"; */
 
 // Attribs
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ color red                = #ff0000;
 color letterBlockBG      = #ffae56;
 color letterBlockBGHit   = #ff0000;
 color letterBlockOutline = #000000;
-color bullet             = #ff9622;
+//color bullet             = #ff9622;
 
 // Game Elements
 int deadZombies   = 0;
@@ -64,6 +64,7 @@ PImage imgZombieIcon       = loadImage("img/icons/zombie.png");
 PImage imgBackgroundOver   = loadImage("img/background-game-over.jpg");
 PImage imgMoneyIcon        = loadImage("img/icons/money.png");
 PImage imgPlayer           = loadImage("img/player.png");
+PImage imgBullet           = loadImage("img/bullet.png");
 
 // Audio
 var audioMenu;

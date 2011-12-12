@@ -25,12 +25,10 @@ class Bullet
         ammoRemaining--;
     }
     
-    // Renders the "bullet". For now this is just a squashed ellipse.
+    // Renders the "bullet".
     void draw()
     {
-        fill(bullet);
-        noStroke();
-        ellipse(x, player.getBulletHeight(), 15, 5);
+        image(imgBullet, x, player.getBulletHeight());
     }
 
     // Move the bullet forward based on it's speed, and check if it's hit/miss.
