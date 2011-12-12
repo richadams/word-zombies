@@ -8,6 +8,7 @@ class Level
     int num; // Level number
     int extraAmmo = 0;
     boolean completed = false;
+    int totalZombieCount = 0;
 
     // Constructor
     Level(int levelNumber)
@@ -55,6 +56,7 @@ class Level
         // Start the game
         currentState     = GameState.IN_GAME;
         zombiesRemaining = levelZombies.size();
+        totalZombieCount = zombiesRemaining;
         if (audioEnabled) { audioMenu.pause(); }
 
         // Restart the loop
@@ -70,7 +72,7 @@ class Level
     }
 
     // Zombie handling
-    int totalZombies()      { return levelZombies.size(); }
+    int totalZombies()      { return totalZombieCount; }
     boolean isMoreZombies() { return (levelZombies.size() != 0); }
     Zombie getNextZombie()
     {

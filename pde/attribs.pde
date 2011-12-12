@@ -29,6 +29,7 @@ int backgroundSpeed      = 1;
 int bulletSpeed          = 100;
 int zombieAnimationSpeed = 3; // Higher = slower
 int zombieFrames         = 3;
+int deadZombiesToKeep    = 3; // Number of dead zombies to remain on screen.
 
 boolean audioEnabled     = false;
 

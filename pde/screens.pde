@@ -26,6 +26,19 @@ void drawMessageArea()
     rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight);
 }
 
+// This draws a message, for loading messages, etc.
+void drawMessage(String message)
+{
+    fill(255);
+    rect((width / 2) - 100, (height / 2) - 10, 200, 20);
+    
+    textFont(fontSerif);
+    textSize(20);
+    textAlign(CENTER);
+    fill(0);
+    text(message, width / 2, (height / 2) + 5);
+}
+
 // The game over screen, plays the relevant audio and shows the score status.
 void gameOver()
 {

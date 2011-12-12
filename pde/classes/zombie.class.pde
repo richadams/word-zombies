@@ -159,6 +159,9 @@ class Zombie
 
         deadZombies++;        
         dead = true;
+        
+        // If there are too many zombies on screen, remove oldest.
+        if (deadZombies > deadZombiesToKeep) { zombies.remove(0); }
 
         // Lower to ground
         y += 160;

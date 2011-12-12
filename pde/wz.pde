@@ -36,6 +36,9 @@ void draw()
         case GameState.MENU:
             stop(); showIntro(); return;
             break;
+        case GameState.LOADING_LEVEL:
+            stop(); showLoading(); return;
+            break;
         case GameState.LEVEL_LOADED:
             stop(); levelStartScreen(); return;
             break;
@@ -69,7 +72,7 @@ void draw()
     }
 
     // If no more zombies, and all zombies dead
-    if (zombies.size() == deadZombies
+    if (deadZombies == currentLevel.totalZombies()
         && !currentLevel.isMoreZombies())
     {
         currentState = GameState.END_LEVEL_ALL_DEAD;
@@ -156,7 +159,7 @@ void keyReleased()
     {
         case GameState.IN_GAME:
             if (ammoRemaining == 0) { return; }
-            bullets.add(new Bullet(str(key))); // Fire a bullet
+            bullets.add(new Bullet(str(key).toUpperCase())); // Fire a bullet
             break;
     }
 }
@@ -174,6 +177,7 @@ void mouseReleased()
             getLevel(currentLevelNumber);
             break;
        case GameState.LEVEL_LOADED:
+            drawMessage("Rendering level...");
             currentLevel.startLevel();
             break;
        case GameState.GAME_OVER:
@@ -188,6 +192,10 @@ void mouseReleased()
 // Function to grab level information for WWZ via AJAX
 function getLevel(level)
 {
+    // Update state
+    currentState = GameState.LOADING_LEVEL;
+    drawMessage("Loading level definition...");
+    
     // Retrieve the file
     $.ajax({
         url: "./levels/" + level,
@@ -206,11 +214,6 @@ function getLevel(level)
 
 void loadLevel(params)
 {
-    // Params are in form "WORD SPEED\n";
-
-    // Update state
-    currentState = GameState.LOADING_LEVEL;
-
     // Create a new level
     currentLevel = new Level(currentLevelNumber);
 
@@ -242,6 +245,7 @@ void loadLevel(params)
     }
 
     currentState = GameState.LEVEL_LOADED;
+    drawMessage("Level loaded, parsing info...");
     start();
 }
 
