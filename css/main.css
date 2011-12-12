@@ -15,6 +15,9 @@ body {
 
 canvas {
     height: 640px;
+    width: 768px;
+    margin: 0 auto;
+    display: block;
 }
 
 /* KEYBOARD

@@ -61,7 +61,13 @@ class Level
         currentState     = GameState.IN_GAME;
         zombiesRemaining = levelZombies.size();
         totalZombieCount = zombiesRemaining;
-        if (audioEnabled) { audioMenu.pause(); }
+        if (audioEnabled) 
+        { 
+            audioMenu.pause();
+            audioMenu.currentTime = 0;
+            audioLockAndLoad.currentTime = 0;
+            audioLockAndLoad.play();
+        }
 
         // Restart the loop
         start();

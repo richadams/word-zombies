@@ -51,4 +51,7 @@ $(document).ready(function ()
     {
         instance.keyboardPress($(this).attr("value"));
     });
+    
+    // Finally, give the canvas focus, so web users don't have to click into it first.
+    $("canvas#wz").focus();
 });

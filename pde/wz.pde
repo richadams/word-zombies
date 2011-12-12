@@ -19,9 +19,11 @@ void setup()
 
     if (audioEnabled)
     {
-        audioMenu     = new Audio("./audio/menu.mp3");
-        audioBullet   = new Audio("./audio/bullet.wav");
-        audioGameOver = new Audio("./audio/scream.mp3");
+        audioMenu        = new Audio("./audio/menu.mp3");
+        audioBullet      = new Audio("./audio/bullet.wav");
+        audioGameOver    = new Audio("./audio/scream.mp3");
+        audioLockAndLoad = new Audio("./audio/lockload.wav");
+        audioEmpty       = new Audio("./audio/empty.wav");
     }
 }
 
@@ -158,10 +160,21 @@ void keyReleased()
     switch (currentState)
     {
         case GameState.IN_GAME:
-            if (ammoRemaining == 0) { return; }
+            if (ammoRemaining == 0) 
+            { 
+                if (audioEnabled) 
+                {
+                    audioEmpty.currentTime = 0; 
+                    audioEmpty.play();
+                }
+                return; 
+            }
             bullets.add(new Bullet(str(key).toUpperCase())); // Fire a bullet
             break;
     }
+    
+    // Enter is equiv to a "tap" on the screen.
+    if (keyCode == ENTER) { mouseReleased(); }
 }
 
 // aka Touch event

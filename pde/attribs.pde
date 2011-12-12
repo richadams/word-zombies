@@ -69,6 +69,8 @@ PImage imgPlayer           = loadImage("img/player.png");
 var audioMenu;
 var audioBullet;
 var audioGameOver;
+var audioLockAndLoad;
+var audioEmpty;
 
 // Fonts
 var fontSerif     = loadFont("serifbold");
