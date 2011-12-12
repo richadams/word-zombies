@@ -105,7 +105,7 @@ for ($l = $_startLevel; $l < $_startLevel + $_numLevels; $l++)
         // Now pick a word frm the skill set, that we haven't already used.
         $word = "";
         $count = 5; // Infinite loop protection.
-        while (in_array($word, $words_used) && $count > 0) 
+        while ((in_array($word, $words_used) && $count > 0) || $word == "") 
         {
             $word = $words[$skill][array_rand($words[$skill])];
             $count--;

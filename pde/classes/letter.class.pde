@@ -42,9 +42,8 @@ class Letter
 
         // Text
         fill(0);
-        textFont(loadFont("monospace"));
         textAlign(LEFT);
-        textSize(30);
+        textFont(loadFont("monospace"), 30);
         text(letter, x + 5, y + height - 7);
     }
 

@@ -116,14 +116,14 @@ void setupBackground()
     rect(0, 0, width, 24);
 
     // Render the level
-    textFont(fontSerif);
     fill(255);
-    textSize(15);
     textAlign(LEFT);
+    textFont(fontSerif, 15);
     text(" Level: " + currentLevelNumber, 0, 18);
 
     // Render the score
     textAlign(RIGHT);
+    textFont(fontSerif, 15);
     text("$" + totalScore + " (Kills: " + totalKills + ") ", width, 18);
 
     // Render current ammo
@@ -138,11 +138,13 @@ void setupBackground()
         fill(255);
     }
     textAlign(LEFT);
+    textFont(fontSerif, 15);
     text(str(ammoRemaining), ((width / 2) + 5), 18);
 
     // Render zombies reamining
     image(imgZombieIcon, (width / 2) + 10 + textWidth(str(ammoRemaining)), 2);
     fill(255);
+    textFont(fontSerif, 15);
     text(str(zombiesRemaining), ((width / 2) + textWidth(str(ammoRemaining)) + 35), 18);
 }
 
