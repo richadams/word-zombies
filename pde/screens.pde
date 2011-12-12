@@ -5,12 +5,20 @@ void showIntro()
 {
     if (audioEnabled) { audioMenu.play(); }
 
+    // Backdrop
     image(imgMenu, 0, 0);
     
+    // Drop shadow
+    fill(0);
+    rect((width / 2) - 175 + 1, (height / 2) - 25 + 280 + 1, 350, 35, 10);
+    
+    // Main rectagle (rounded)
+    fill(255);
+    rect((width / 2) - 175, (height / 2) - 25 + 280, 350, 35, 10);
+    
+    // Text
     textSize(20);
     textAlign(CENTER);
-    fill(255);
-    text("Tap screen to start a new game!", (width / 2) +1, (height / 2) + 281);
     fill(0);
     text("Tap screen to start a new game!", width / 2, (height / 2) + 280);
 }
@@ -20,17 +28,17 @@ void drawMessageArea()
 {
     // Drop Shadow
     fill(0);
-    rect((width / 2) - (messageWidth / 2) + 5, (height / 2) - (messageHeight /2) + 5, messageWidth, messageHeight);
+    rect((width / 2) - (messageWidth / 2) + 3, (height / 2) - (messageHeight /2) + 3, messageWidth, messageHeight, 10);
 
     fill(255);
-    rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight);
+    rect((width / 2) - (messageWidth / 2), (height / 2) - (messageHeight /2), messageWidth, messageHeight, 10);
 }
 
 // This draws a message, for loading messages, etc.
 void drawMessage(String message)
 {
     fill(255);
-    rect((width / 2) - 100, (height / 2) - 10, 200, 20);
+    rect((width / 2) - 100, (height / 2) - 10, 200, 20, 3);
     
     textFont(fontSerif);
     textSize(20);

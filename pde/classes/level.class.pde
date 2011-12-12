@@ -22,7 +22,11 @@ class Level
     }
 
     // Add a zombie
-    void addZombie(Zombie z) { levelZombies.add(z); }
+    void addZombie(Zombie z) 
+    { 
+        levelZombies.add(z);
+        totalZombieCount++;
+    }
 
     // Start the level
     void startLevel()
