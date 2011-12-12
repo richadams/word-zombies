@@ -38,7 +38,7 @@ class Letter
         fill(((h) ? letterBlockBGHit : letterBlockBG));
         stroke(letterBlockOutline);
         strokeWeight(1);
-        rect(x, y, width, height);
+        rect(x, y, width, height, 2);
 
         // Text
         fill(0);

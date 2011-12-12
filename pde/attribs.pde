@@ -39,7 +39,7 @@ Level currentLevel;
 int currentLevelNumber = 1;
 int nextZombieInterval = 0;
 int backgroundOffset   = 0;
-int backgroundLimit    = height - 2000;
+int backgroundLimit    = height - 2000 - 216; // Height - image height - ground height
 int ammoRemaining      = 0;
 int zombiesRemaining   = 0;
 

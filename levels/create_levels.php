@@ -76,6 +76,7 @@ $output = "";
 for ($l = $_startLevel; $l < $_startLevel + $_numLevels; $l++)
 {
     echo "Generating level ".$l."...";
+    $words_used = array();
     
     // Generate between 20 and 30 zombies per level. Times about right with daylight.
     $numZombies = rand(20, 30);
@@ -101,12 +102,21 @@ for ($l = $_startLevel; $l < $_startLevel + $_numLevels; $l++)
         // If we have no words for a particular skill level, then go backwards until we do.
         while (!isset($words[$skill])) { $skill--; }
         
-        // Now pick a word frm the skill set.
-        $word = $words[$skill][array_rand($words[$skill])];
+        // Now pick a word frm the skill set, that we haven't already used.
+        $word = "";
+        $count = 5; // Infinite loop protection.
+        while (in_array($word, $words_used) && $count > 0) 
+        {
+            $word = $words[$skill][array_rand($words[$skill])];
+            $count--;
+        }
         $totalChars += strlen($word);        
         
         // Determine Zombie type. For now this is based on speed.
         $type = ($speed < 15) ? "slow" : "fast";
+        
+        // Keep track of words already used in this level.
+        $words_used[] = $word;
         
         // Append zombies to output
         $output .= $type." ".strtoupper($word)." ".$speed."\n";
