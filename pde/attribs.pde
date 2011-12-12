@@ -72,6 +72,7 @@ var audioBullet;
 var audioGameOver;
 var audioLockAndLoad;
 var audioEmpty;
+var audioGroovy;
 
 // Fonts
 var fontSerif     = loadFont("serifbold");

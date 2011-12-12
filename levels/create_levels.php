@@ -72,10 +72,11 @@ foreach ($lines as $l)
 }
 
 // Now I have words and a skill level, construct the levels.
-$output = "";
 for ($l = $_startLevel; $l < $_startLevel + $_numLevels; $l++)
 {
     echo "Generating level ".$l."...";
+    
+    $output = "";
     $words_used = array();
     
     // Generate between 20 and 30 zombies per level. Times about right with daylight.

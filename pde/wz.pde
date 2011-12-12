@@ -24,6 +24,7 @@ void setup()
         audioGameOver    = new Audio("./audio/scream.mp3");
         audioLockAndLoad = new Audio("./audio/lockload.wav");
         audioEmpty       = new Audio("./audio/empty.wav");
+        audioGroovy      = new Audio("./audio/groovy.mp3");
     }
 }
 
@@ -210,6 +211,12 @@ function getLevel(level)
     // Update state
     currentState = GameState.LOADING_LEVEL;
     drawMessage("Loading level definition...");
+    
+    /*if (audioEnabled)
+    {
+        audioGroovy.currentTime = 0;
+        audioGroovy.play();
+    }*/
     
     // Retrieve the file
     $.ajax({
