@@ -1,0 +1,24 @@
+This directory contains the tools required to automatically generate Word Zombies levels.
+
+=== run.sh ===
+The only script which needs to be run. It groups together everything in one process. Just run
+this to create some new levels.
+
+The level creation process is fully automated and random. Just run the above script with the 
+specified parameters, and new levels will appear. The levels will be progressively more diffcult. 
+Difficulty is based on the word frequency and length, and the speed of the zombie. Different
+Zombie types will also be used from the ones available (see create_levels.php).
+
+Other Files:
+
+=== source.txt ===
+The source for gathering word data and information. Frankenstein is used as the example, but any
+book can be used in it's place.
+
+=== prepare_wz_dict.py ===
+This program takes in the source and will produce an output listing the words, lengths and 
+frequencies that were in the input. Lengths and word frequency are used to determine their
+difficulty when creating levels.
+
+=== create_levels.php ===
+This will take all the available data and create some random levels. It does all the heavy lifting.
