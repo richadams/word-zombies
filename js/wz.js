@@ -1,8 +1,5 @@
 // Words with Zombies
 
-// Processing instance
-var instance;
-
 // Includes
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,13 +40,13 @@ $(document).ready(function ()
 {
     // Init the processing instance
     $("canvas#wz").attr("data-src", processingFiles);
-    instance = new Processing(document.getElementById("wz"));
+    new Processing(document.getElementById("wz"));
 
     // Bind keyboard events, pass through to processing.
     // Have to use "touchstart" event as Apple introduce a 300ms delay on "click" events.
     $("#keyboard input[type=submit]").bind("touchstart", function()
     {
-        instance.keyboardPress($(this).attr("value"));
+        Processing.getInstanceById("wz").keyboardPress($(this).attr("value"));
     });
     
     // Finally, give the canvas focus, so web users don't have to click into it first.
